@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:login/settings.dart';
 import 'package:login/login.dart';
 
-void main() => runApp(new MyApp());
+// void main() => runApp(new MyApp());
 
 class MyApp extends StatefulWidget {
   _MyAppState createState() => new _MyAppState();
