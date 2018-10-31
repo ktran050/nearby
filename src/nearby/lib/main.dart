@@ -1,131 +1,7 @@
-
-import 'package:flutter/material.dart';
-
-/*void main() {
-  runApp(MaterialApp(
-    title: 'Named Routes Demo',
-    // Start the app with the "/" named route. In our case, the app will start
-    // on the FirstScreen Widget
-    initialRoute: '/',
-    routes: {
-      // When we navigate to the "/" route, build the FirstScreen Widget
-      '/': (context) => HomePage(),
-      // When we navigate to the "/second" route, build the SecondScreen Widget
-      '/second': (context) => ProfilePage(),
-    },
-  ));
-}
-
-class HomePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('First Screen'),
-      ),
-      body: Center(
-        child: RaisedButton(
-          child: Text('Launch screen'),
-          onPressed: () {
-            // Navigate to the second screen using a named route
-            Navigator.pushNamed(context, '/second');
-          },
-        ),
-      ),
-      floatingActionButton: new FloatingActionButton(
-        onPressed: () { Navigator.pushNamed(context, '/second'); },
-        tooltip: 'Go Forward',
-        child: new Icon(Icons.account_circle),
-      ),
-    );
-  }
-}
-
-class ProfilePage extends StatelessWidget{
-  @override
-  Widget build(BuildContext context){
-    final appTitle = 'test';
-    return MaterialApp(
-      title: appTitle,
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text(appTitle),
-        ),
-        body: ProfilePageForm(),
-        floatingActionButton: new FloatingActionButton(
-          onPressed: () {Navigator.pop(context);},
-          tooltip: 'Go back',
-          child: new Icon(Icons.arrow_back),
-        ),
-      )
-    );
-  }
-}
-
-class ProfilePageForm extends StatefulWidget {
-  @override
-  ProfilePageFormState createState() { return ProfilePageFormState(); }
-}
-
-class ProfilePageFormState extends State<ProfilePageForm>{
-  // Create a global key that will uniquely identify the Form widget and allow
-  // us to validate the form
-  //
-  // Note: This is a GlobalKey<FormState>, not a GlobalKey<MyCustomFormState>!
-  final _formKey = GlobalKey<FormState>();
-  String _bioText = "Please enter a bio";
-
-  void _updateBio(String s){
-    _bioText = s;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // Build a Form widget using the _formKey we created above
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          TextFormField(
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              hintText: 'This is a test',
-            ),
-            validator: (value) {
-              if (value.isEmpty) {
-                return 'Please enter some text';
-              }
-            }, onFieldSubmitted: (value) {
-                _updateBio(value);
-            },
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: RaisedButton(
-              onPressed: () {
-                // Validate will return true if the form is valid, or false if
-                // the form is invalid.
-                if (_formKey.currentState.validate()) {
-                  // If the form is valid, we want to show a Snackbar
-                  Scaffold.of(context)
-                      .showSnackBar(SnackBar(content: Text('Processing Data')));
-                }
-              },
-              child: Text('Submit'),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}*/
-
 import 'package:flutter/material.dart';
 import 'package:nearby/settings.dart';
 import 'package:nearby/login.dart';
-
-//void main() => runApp(new MyApp());
+import 'package:english_words/english_words.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -224,6 +100,42 @@ class _LoginPageState extends State<LogInPage> {
   }
 }
 
+class _LoripState extends State<Lorip>{
+  final _feed = <WordPair>[];
+
+  Widget _buildRow(WordPair pair){
+    return ListTile(
+      title: Center(
+          child: Text(pair.asLowerCase)
+      ),
+    );
+  }
+  Widget _buildFeed(){
+    return ListView.builder(
+      itemExtent: 75.0,
+      padding: const EdgeInsets.all(16.0),
+      itemBuilder: (context,i){
+        if(i.isOdd) return Divider();
+        final index = i~/2;
+        if(index >= _feed.length){
+          _feed.addAll(generateWordPairs().take(10));
+        }
+        return _buildRow(_feed[index]);
+      }
+    );
+  }
+
+  @override
+  Widget build(BuildContext context){
+    return _buildFeed();
+  }
+}
+
+class Lorip extends StatefulWidget{
+  @override
+  _LoripState createState() => new _LoripState();
+}
+
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -232,13 +144,7 @@ class HomePage extends StatelessWidget {
         title: Text('Feed'),
       ),
       body: Center(
-        child: RaisedButton(
-          child: Text('Launch screen'),
-          onPressed: () {
-            // Navigate to the second screen using a named route
-            Navigator.pushNamed(context, '/third');
-          },
-        ),
+        child: Lorip(),
       ),
       floatingActionButton: new FloatingActionButton(
         onPressed: () { Navigator.pushNamed(context, '/third'); },
@@ -252,7 +158,7 @@ class HomePage extends StatelessWidget {
 class ProfilePage extends StatelessWidget{
   @override
   Widget build(BuildContext context){
-    final appTitle = 'test';
+    final appTitle = 'Profile';
     return MaterialApp(
         title: appTitle,
         home: Scaffold(
@@ -295,9 +201,10 @@ class ProfilePageFormState extends State<ProfilePageForm>{
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           TextFormField(
+            textAlign: TextAlign.center,
             decoration: InputDecoration(
               border: InputBorder.none,
-              hintText: 'This is a test',
+              hintText: 'Tell us a litle about yourself!',
             ),
             validator: (value) {
               if (value.isEmpty) {
@@ -307,8 +214,8 @@ class ProfilePageFormState extends State<ProfilePageForm>{
             _updateBio(value);
           },
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
+          Center(
+//            padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: RaisedButton(
               onPressed: () {
                 // Validate will return true if the form is valid, or false if
