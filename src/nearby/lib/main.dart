@@ -139,9 +139,21 @@ void main() {
       '/second': (context) => HomePage(),
       // When we navigate to the "/second" route, build the SecondScreen Widget
       '/third': (context) => ProfilePage(),
+      '/settings': (context) => settings(),
     },
   ));
 }
+
+/*
+class SettingsPage extends StatefulWidget {
+  SettingsPageState createState() => new SettingsPageState();
+}
+
+class SettingsPageState extends State<SettingsPage>{
+
+}
+*/
+
 
 class LogInPage extends StatefulWidget {
   _LoginPageState createState() => new _LoginPageState();
@@ -240,11 +252,23 @@ class HomePage extends StatelessWidget {
           },
         ),
       ),
-      floatingActionButton: new FloatingActionButton(
-        onPressed: () { Navigator.pushNamed(context, '/third'); },
-        tooltip: 'Go to Profile',
-        child: new Icon(Icons.account_circle),
-      ),
+        floatingActionButton: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              FloatingActionButton(
+                heroTag: null,
+                onPressed: () { Navigator.pushNamed(context, '/third'); },
+                tooltip: 'Go to Profile',
+                child: new Icon(Icons.account_circle),
+              ),
+              FloatingActionButton(
+                heroTag: null,
+                onPressed: () { Navigator.pushNamed(context, '/settings');},
+                tooltip: 'Go to Settings',
+                child: new Icon(Icons.settings),
+              )
+            ]
+        )
     );
   }
 }
@@ -327,3 +351,5 @@ class ProfilePageFormState extends State<ProfilePageForm>{
     );
   }
 }
+
+
