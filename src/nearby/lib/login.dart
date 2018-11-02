@@ -52,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
         }
       }
       catch (e) {
-        print('Error: $e'); //prints out msg if the email/password is invalid or in the wrong format
+        print('Error: $e'); //prints out debug msg if the email/password is invalid or in the wrong format
       }
     }
   }
