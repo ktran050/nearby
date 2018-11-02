@@ -1,36 +1,133 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter/foundation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+//import 'package:flutter/widgets.dart';
+//import 'package:flutter/foundation.dart';
 
-class login extends StatelessWidget {
-  const login ({
-    Key key,
-    @required this.onSubmit,
-  }) : super(key:key);
+class LoginPage extends StatefulWidget {
+  @override
+    State<StatefulWidget> createState() => new _LoginPageState();
+}
 
-  final VoidCallback onSubmit;
-  static final TextEditingController _user = new TextEditingController();
-  static final TextEditingController _pass = new TextEditingController();
+//implements 2 different states for the page.
+// i.e. on button press, switches two buttons implemented below
+enum FormType{
+  login,
+  register
+}
 
-  String get username => _user.text;
-  String get password => _pass.text;
+class _LoginPageState extends State<LoginPage> {
+
+  //lets us save the username and password
+  final formKey = new GlobalKey<FormState>();
+
+  String _email;
+  String _password;
+  FormType _formType = FormType.login;
+
+  //checks validators in the widget below I.E. if the email and password is empty or not
+  //saves input into _email and _password
+  bool validateAndSave(){
+    final form = formKey.currentState;
+    if(form.validate()){
+      form.save();
+      print('Valid Form. Email: $_email, password: $_password'); //debug test to show the un/pw persists
+      return true;
+    }
+    return false;
+  }
+
+  //checks firebase with the email and password
+  void validateAndSubmit() async {
+    if(validateAndSave()){
+      try {
+        if(_formType == FormType.login) {
+          print('waiting for firebase'); //debug test
+          FirebaseUser user = await FirebaseAuth.instance.signInWithEmailAndPassword(email: _email, password: _password);
+          Navigator.pushNamed(context, '/second'); //if the user logs in with right credentials they're taken to the home screen
+          print('Signed In: ${user.uid}');
+        } else {
+          print('waiting for firebase');
+          FirebaseUser user = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: _email, password: _password);
+          print('Registered user: ${user.uid}');
+        }
+      }
+      catch (e) {
+        print('Error: $e'); //prints out msg if the email/password is invalid or in the wrong format
+      }
+    }
+  }
+
+  //switches the state
+  void moveToRegister(){
+    formKey.currentState.reset(); //clears User input when they tap 'Don't Have An Account'
+    setState((){
+      _formType = FormType.register;
+    });
+  }
+
+  void moveToLogin(){
+    formKey.currentState.reset();
+    setState((){
+      _formType = FormType.login;
+    });
+  }
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-        padding: EdgeInsets.symmetric(horizontal: 32.0),
-        margin: EdgeInsets.symmetric(horizontal: 32.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            new TextField(controller: _user,
-              decoration: new InputDecoration(hintText: 'Enter a username'),),
-            new TextField(controller: _pass,
-              decoration: new InputDecoration(hintText: 'Enter a password'),
-              obscureText: true,),
-            new RaisedButton(child: new Text('Submit'), onPressed: onSubmit)
-          ],
-        )
-    );
+    Widget build(BuildContext context) {
+      return new Scaffold(
+       appBar: new AppBar(
+         title: new Text('Welcome'),
+       ),
+       body: new Container(
+         padding: EdgeInsets.all(16.0),
+         child: new Form(
+           key: formKey,
+          child: new Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              new TextFormField(
+                decoration: new InputDecoration(labelText: 'Enter Email'),
+                validator: (input) => input.isEmpty ? '*required': null,
+                onSaved: (input) => _email = input,
+              ),
+              new TextFormField(
+                decoration: new InputDecoration(labelText: 'Enter Password'),
+                validator: (input) => input.isEmpty ? '*required': null,
+                onSaved: (input) => _password = input,
+                obscureText: true,
+              ),
+            ]
+            + buildLoginButtons(),
+          )
+         )
+       )
+      );
+  }
+
+  //changes what the buttons say depending on the state
+  List<Widget> buildLoginButtons() {
+    if(_formType == FormType.login){
+      return [
+        new RaisedButton(
+          child: new Text('Login', style: new TextStyle(fontSize: 20.0)),
+          onPressed: validateAndSubmit,
+        ),
+        new FlatButton(
+            child: new Text('Don\'t Have an Account?', style: new TextStyle(fontSize: 20.0)),
+            onPressed: moveToRegister,
+        ),
+      ];
+    } else {
+      return [
+        new RaisedButton(
+          child: new Text('Sign Up', style: new TextStyle(fontSize: 20.0)),
+          onPressed: validateAndSubmit,
+        ),
+        new FlatButton(
+            child: new Text('Already Have an Account?', style: new TextStyle(fontSize: 20.0)),
+            onPressed: moveToLogin,
+        ),
+      ];
+    }
   }
 }

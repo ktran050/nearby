@@ -10,102 +10,13 @@ void main() {
     // on the FirstScreen Widget
     initialRoute: '/',
     routes: {
-      '/': (context) => LogInPage(),
+      '/': (context) => LoginPage(),
       // When we navigate to the "/" route, build the FirstScreen Widget
       '/second': (context) => HomePage(),
       // When we navigate to the "/second" route, build the SecondScreen Widget
       '/third': (context) => ProfilePage(),
     },
   ));
-}
-
-//class SettingsPage extends StatefulWidget {
-//  SettingsPageState createState() => new SettingsPageState();
-//}
-//
-//class SettingsPageState extends State<SettingsPage>{
-//  return 8
-//}
-
-class LogInPage extends StatefulWidget {
-  _LoginPageState createState() => new _LoginPageState();
-}
-
-class _LoginPageState extends State<LogInPage> {
-
-  String _title = 'Please Login';
-//  Widget _screen;
-  login _login;
-  settings _settings;
-  bool _authenticated;
-
-  _LoginPageState() {
-    _login = new login(onSubmit: (){onSubmit();});
-    _settings = new settings();
- //   _screen = _login;
-    _authenticated = false;
-  }
-
-  void onSubmit() {
-    print('Login with: ' + _login.username + ' ' + _login.password);
-    //delete the if statement later. just for demo. link with firebase
-    if(_login.username == 'user' && _login.password == 'pw') {
-      _setAuthenticated(true);
-    }
-  }
-
-  void _goHome() {
-    print('go home');
-    setState(() {
-      if(_authenticated == true) {
-   //     _screen = _settings;
-        Navigator.pushNamed(context,'/second');
-      }
-      else {
-    //    _screen = _login;
-      }
-    }
-    );
-  }
-  void _logout() {
-    print('log out');
-  }
-
-  void _setAuthenticated(bool auth) {
-    setState(() {
-      if(auth == true) {
-    //    _screen = _settings;
-        Navigator.pushNamed(context,'/second');
-        _title = 'Welcome';
-        _authenticated = true;
-      }
-      else {
-      //  _screen = _login;
-        _title = 'Please Login';
-        _authenticated = false;
-      }
-    }
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return new MaterialApp (
-      title: 'Login Demo',
-      home: new Scaffold(
-        appBar: new AppBar(
-          title: new Text(_title),
-          actions: <Widget>[
-            new IconButton(icon: new Icon(Icons.home),
-                onPressed: (){_goHome();}),
-            new IconButton(icon: new Icon(Icons.exit_to_app),
-                onPressed: (){_logout();}),
-          ],
-        ),
-        body: _login, // _screen,
-      ),
-    );
-  }
 }
 
 class _LoripState extends State<Lorip>{
@@ -254,3 +165,113 @@ class ProfilePageFormState extends State<ProfilePageForm>{
     );
   }
 }
+
+
+
+/*
+void main() => runApp(new MyApp());
+
+class MyApp extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    return new MaterialApp(
+      title: 'Nearby App',
+      home: new LoginPage()
+    );
+  }
+}
+
+*/
+
+//class SettingsPage extends StatefulWidget {
+//  SettingsPageState createState() => new SettingsPageState();
+//}
+//
+//class SettingsPageState extends State<SettingsPage>{
+//  return 8
+//}
+
+
+/*
+class LogInPage extends StatefulWidget {
+  _LoginPageState createState() => new _LoginPageState();
+}
+
+class _LoginPageState extends State<LogInPage> {
+
+  String _title = 'Please Login';
+//  Widget _screen;
+  login _login;
+  settings _settings;
+  bool _authenticated;
+
+  _LoginPageState() {
+    _login = new login(onSubmit: (){onSubmit();});
+    _settings = new settings();
+ //   _screen = _login;
+    _authenticated = false;
+  }
+
+  void onSubmit() {
+    print('Login with: ' + _login.username + ' ' + _login.password);
+    //delete the if statement later. just for demo. link with firebase
+    if(_login.username == 'user' && _login.password == 'pw') {
+      _setAuthenticated(true);
+    }
+  }
+
+  void _goHome() {
+    print('go home');
+    setState(() {
+      if(_authenticated == true) {
+   //     _screen = _settings;
+        Navigator.pushNamed(context,'/second');
+      }
+      else {
+    //    _screen = _login;
+      }
+    }
+    );
+  }
+  void _logout() {
+    print('log out');
+  }
+
+  void _setAuthenticated(bool auth) {
+    setState(() {
+      if(auth == true) {
+    //    _screen = _settings;
+        Navigator.pushNamed(context,'/second');
+        _title = 'Welcome';
+        _authenticated = true;
+      }
+      else {
+      //  _screen = _login;
+        _title = 'Please Login';
+        _authenticated = false;
+      }
+    }
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new MaterialApp (
+      title: 'Login Demo',
+      home: new Scaffold(
+        appBar: new AppBar(
+          title: new Text(_title),
+          actions: <Widget>[
+            new IconButton(icon: new Icon(Icons.home),
+                onPressed: (){_goHome();}),
+            new IconButton(icon: new Icon(Icons.exit_to_app),
+                onPressed: (){_logout();}),
+          ],
+        ),
+        body: _login, // _screen,
+      ),
+    );
+  }
+}
+*/
