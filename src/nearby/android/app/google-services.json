@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "856169991154",
+    "firebase_url": "https://ucrcuties.firebaseio.com",
+    "project_id": "ucrcuties",
+    "storage_bucket": "ucrcuties.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:856169991154:android:3925cad56f622fa3",
+        "android_client_info": {
+          "package_name": "com.example.nearby"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "856169991154-c3gklmmk6tadnativ8qbij724kkaqi82.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7VhJvPoXHltuUvXggL0VriFSBEy_TyY4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
