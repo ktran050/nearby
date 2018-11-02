@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nearby/settings.dart';
 import 'package:nearby/login.dart';
 import 'package:english_words/english_words.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -56,6 +57,13 @@ class Lorip extends StatefulWidget{
 }
 
 class HomePage extends StatelessWidget {
+
+  //test func to add a post to our database
+  void addToDatabase() async{
+    await Firestore.instance.collection('posts').document().setData({ 'title': 'yaboy\'s post', 'author': 'yaboy' });
+    print('added to database');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,7 +71,11 @@ class HomePage extends StatelessWidget {
         title: Text('Feed'),
       ),
       body: Center(
-        child: Lorip(),
+//        child: Lorip(),
+        child: new RaisedButton(
+          child: new Text('Add Post to Database', style: new TextStyle(fontSize: 20.0)),
+          onPressed: addToDatabase,
+        ),
       ),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
