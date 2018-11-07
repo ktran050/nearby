@@ -14,6 +14,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
     FirebaseUser a = await FirebaseAuth.instance.currentUser();
 //    await Firestore.instance.collection('posts').document().setData({ 'title': 'yaboy\'s post', 'author': a.displayName});
 //    print('added to database');
+    if (a.displayName == 'null') {
+      UserUpdateInfo update = UserUpdateInfo();
+      update.displayName = 'TestUser';
+      a.updateProfile(update);
+    }
     String name = a.displayName;
     print('Name = $name ');
     }
