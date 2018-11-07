@@ -17,18 +17,12 @@ void main() {
       '/second': (context) => HomePage(),
       // When we navigate to the "/second" route, build the SecondScreen Widget
       '/third': (context) => ProfilePage(),
-      '/createPost': (context) => CreatePostPage(),
+      '/createPost': (context) => CreatePostPage(),//../tePostPage(),
     },
   ));
 }
 
 class HomePage extends StatelessWidget {
-
-  //test func to add a post to our database
-  void addToDatabase() async{
-    await Firestore.instance.collection('posts').document().setData({ 'title': 'yaboy\'s post', 'author': 'yaboy' });
-    print('added to database');
-  }
 
   @override
   Widget build(BuildContext context) {

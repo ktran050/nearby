@@ -48,6 +48,9 @@ class _LoginPageState extends State<LoginPage> {
         } else {
           print('waiting for firebase');
           FirebaseUser user = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: _email, password: _password);
+          UserUpdateInfo update = UserUpdateInfo();
+          update.displayName = 'TestUser';
+          user.updateProfile(update);
           print('Registered user: ${user.uid}');
         }
       }
