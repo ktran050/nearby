@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nearby/settings.dart';
+import 'package:nearby/createPost.dart';
 import 'package:nearby/login.dart';
 import 'package:english_words/english_words.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -16,46 +17,10 @@ void main() {
       '/second': (context) => HomePage(),
       // When we navigate to the "/second" route, build the SecondScreen Widget
       '/third': (context) => ProfilePage(),
+      '/createPost': (context) => CreatePostPage(),
     },
   ));
 }
-
-class _LoripState extends State<Lorip>{
-  final _feed = <WordPair>[];
-
-  Widget _buildRow(WordPair pair){
-    return ListTile(
-      title: Center(
-          child: Text(pair.asLowerCase)
-      ),
-    );
-  }
-  Widget _buildFeed(){
-    return ListView.builder(
-      itemExtent: 75.0,
-      padding: const EdgeInsets.all(16.0),
-      itemBuilder: (context,i){
-        if(i.isOdd) return Divider();
-        final index = i~/2;
-        if(index >= _feed.length){
-          _feed.addAll(generateWordPairs().take(10));
-        }
-        return _buildRow(_feed[index]);
-      }
-    );
-  }
-
-  @override
-  Widget build(BuildContext context){
-    return _buildFeed();
-  }
-}
-
-class Lorip extends StatefulWidget{
-  @override
-  _LoripState createState() => new _LoripState();
-}
-
 class HomePage extends StatelessWidget {
 
   //test func to add a post to our database
@@ -74,7 +39,8 @@ class HomePage extends StatelessWidget {
 //        child: Lorip(),
         child: new RaisedButton(
           child: new Text('Add Post to Database', style: new TextStyle(fontSize: 20.0)),
-          onPressed: addToDatabase,
+//          onPressed: addToDatabase,
+            onPressed: () { Navigator.pushNamed(context, '/createPost');},
         ),
       ),
       floatingActionButton: Row(
@@ -96,6 +62,42 @@ class HomePage extends StatelessWidget {
       )
     );
   }
+}
+
+class _LoripState extends State<Lorip>{
+  final _feed = <WordPair>[];
+
+  Widget _buildRow(WordPair pair){
+    return ListTile(
+      title: Center(
+          child: Text(pair.asLowerCase)
+      ),
+    );
+  }
+  Widget _buildFeed(){
+    return ListView.builder(
+        itemExtent: 75.0,
+        padding: const EdgeInsets.all(16.0),
+        itemBuilder: (context,i){
+          if(i.isOdd) return Divider();
+          final index = i~/2;
+          if(index >= _feed.length){
+            _feed.addAll(generateWordPairs().take(10));
+          }
+          return _buildRow(_feed[index]);
+        }
+    );
+  }
+
+  @override
+  Widget build(BuildContext context){
+    return _buildFeed();
+  }
+}
+
+class Lorip extends StatefulWidget{
+  @override
+  _LoripState createState() => new _LoripState();
 }
 
 class ProfilePage extends StatelessWidget{
