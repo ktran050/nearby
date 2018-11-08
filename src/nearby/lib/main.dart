@@ -125,10 +125,11 @@ class ProfilePageFormState extends State<ProfilePageForm>{
   //
   // Note: This is a GlobalKey<FormState>, not a GlobalKey<MyCustomFormState>!
   final _formKey = GlobalKey<FormState>();
-  String _bioText = "Please enter a bio";
+  String _bioText = "No";
 
-  void _updateBio(String s){
-    _bioText = s;
+
+  void _updateBio(String btext) async{
+    await Firestore.instance.collection('users').document('UniqueID').setData({ 'bio': btext});
   }
 
   @override
@@ -143,29 +144,26 @@ class ProfilePageFormState extends State<ProfilePageForm>{
             textAlign: TextAlign.center,
             decoration: InputDecoration(
               border: InputBorder.none,
-              hintText: 'Tell us a litle about yourself!',
+              hintText: _bioText,
             ),
             validator: (value) {
               if (value.isEmpty) {
                 return 'Please enter some text';
               }
-            }, onFieldSubmitted: (value) {
-            _updateBio(value);
-          },
+            }, onSaved: (value) => _bioText = value,
           ),
           Center(
-//            padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: RaisedButton(
               onPressed: () {
-                // Validate will return true if the form is valid, or false if
-                // the form is invalid.
                 if (_formKey.currentState.validate()) {
-                  // If the form is valid, we want to show a Snackbar
-                  Scaffold.of(context)
-                      .showSnackBar(SnackBar(content: Text('Processing Data')));
+                  _formKey.currentState.save();
+                  _updateBio( _bioText);  // Update call to helper func.
+
+                  Scaffold.of(context).showSnackBar(SnackBar(
+                      content: Text('Processing Data')));
                 }
               },
-              child: Text('Submit'),
+              child: Text('Update'),
             ),
           ),
         ],
@@ -173,113 +171,3 @@ class ProfilePageFormState extends State<ProfilePageForm>{
     );
   }
 }
-
-
-
-/*
-void main() => runApp(new MyApp());
-
-class MyApp extends StatelessWidget {
-
-  @override
-  Widget build(BuildContext context) {
-    return new MaterialApp(
-      title: 'Nearby App',
-      home: new LoginPage()
-    );
-  }
-}
-
-*/
-
-//class SettingsPage extends StatefulWidget {
-//  SettingsPageState createState() => new SettingsPageState();
-//}
-//
-//class SettingsPageState extends State<SettingsPage>{
-//  return 8
-//}
-
-
-/*
-class LogInPage extends StatefulWidget {
-  _LoginPageState createState() => new _LoginPageState();
-}
-
-class _LoginPageState extends State<LogInPage> {
-
-  String _title = 'Please Login';
-//  Widget _screen;
-  login _login;
-  settings _settings;
-  bool _authenticated;
-
-  _LoginPageState() {
-    _login = new login(onSubmit: (){onSubmit();});
-    _settings = new settings();
- //   _screen = _login;
-    _authenticated = false;
-  }
-
-  void onSubmit() {
-    print('Login with: ' + _login.username + ' ' + _login.password);
-    //delete the if statement later. just for demo. link with firebase
-    if(_login.username == 'user' && _login.password == 'pw') {
-      _setAuthenticated(true);
-    }
-  }
-
-  void _goHome() {
-    print('go home');
-    setState(() {
-      if(_authenticated == true) {
-   //     _screen = _settings;
-        Navigator.pushNamed(context,'/second');
-      }
-      else {
-    //    _screen = _login;
-      }
-    }
-    );
-  }
-  void _logout() {
-    print('log out');
-  }
-
-  void _setAuthenticated(bool auth) {
-    setState(() {
-      if(auth == true) {
-    //    _screen = _settings;
-        Navigator.pushNamed(context,'/second');
-        _title = 'Welcome';
-        _authenticated = true;
-      }
-      else {
-      //  _screen = _login;
-        _title = 'Please Login';
-        _authenticated = false;
-      }
-    }
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return new MaterialApp (
-      title: 'Login Demo',
-      home: new Scaffold(
-        appBar: new AppBar(
-          title: new Text(_title),
-          actions: <Widget>[
-            new IconButton(icon: new Icon(Icons.home),
-                onPressed: (){_goHome();}),
-            new IconButton(icon: new Icon(Icons.exit_to_app),
-                onPressed: (){_logout();}),
-          ],
-        ),
-        body: _login, // _screen,
-      ),
-    );
-  }
-}
-*/
