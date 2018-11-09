@@ -3,6 +3,8 @@ import 'package:nearby/settings.dart';
 import 'package:nearby/login.dart';
 import 'package:english_words/english_words.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -12,10 +14,10 @@ void main() {
     initialRoute: '/',
     routes: {
       '/': (context) => LoginPage(),
-      // When we navigate to the "/" route, build the FirstScreen Widget
-      '/second': (context) => HomePage(),
-      // When we navigate to the "/second" route, build the SecondScreen Widget
-      '/third': (context) => ProfilePage(),
+      // When we navigate to the "/" route, build the Login Page
+      '/home': (context) => HomePage(),
+      '/profile': (context) => ProfilePage(),
+      '/settings': (context) => settings(),
     },
   ));
 }
@@ -60,7 +62,9 @@ class HomePage extends StatelessWidget {
 
   //test func to add a post to our database
   void addToDatabase() async{
-    await Firestore.instance.collection('posts').document().setData({ 'title': 'yaboy\'s post', 'author': 'yaboy' });
+    FirebaseUser a = await FirebaseAuth.instance.currentUser(); //Added line
+    await Firestore.instance.collection('posts').document().setData({ 'title': 'yaboy\'s post', 'author': a.displayName});
+
     print('added to database');
   }
 
@@ -82,7 +86,7 @@ class HomePage extends StatelessWidget {
         children: <Widget>[
           FloatingActionButton(
             heroTag: null,
-            onPressed: () { Navigator.pushNamed(context, '/third'); },
+            onPressed: () { Navigator.pushNamed(context, '/profile'); },
             tooltip: 'Go to Profile',
             child: new Icon(Icons.account_circle),
           ),
@@ -110,7 +114,7 @@ class ProfilePage extends StatelessWidget{
           ),
           body: ProfilePageForm(),
           floatingActionButton: new FloatingActionButton(
-            onPressed: () {Navigator.pop(context);},
+            onPressed: () {Navigator.pushNamed(context, '/home');},
             tooltip: 'Go to home page',
             child: new Icon(Icons.home),
           ),
@@ -177,113 +181,3 @@ class ProfilePageFormState extends State<ProfilePageForm>{
     );
   }
 }
-
-
-
-/*
-void main() => runApp(new MyApp());
-
-class MyApp extends StatelessWidget {
-
-  @override
-  Widget build(BuildContext context) {
-    return new MaterialApp(
-      title: 'Nearby App',
-      home: new LoginPage()
-    );
-  }
-}
-
-*/
-
-//class SettingsPage extends StatefulWidget {
-//  SettingsPageState createState() => new SettingsPageState();
-//}
-//
-//class SettingsPageState extends State<SettingsPage>{
-//  return 8
-//}
-
-
-/*
-class LogInPage extends StatefulWidget {
-  _LoginPageState createState() => new _LoginPageState();
-}
-
-class _LoginPageState extends State<LogInPage> {
-
-  String _title = 'Please Login';
-//  Widget _screen;
-  login _login;
-  settings _settings;
-  bool _authenticated;
-
-  _LoginPageState() {
-    _login = new login(onSubmit: (){onSubmit();});
-    _settings = new settings();
- //   _screen = _login;
-    _authenticated = false;
-  }
-
-  void onSubmit() {
-    print('Login with: ' + _login.username + ' ' + _login.password);
-    //delete the if statement later. just for demo. link with firebase
-    if(_login.username == 'user' && _login.password == 'pw') {
-      _setAuthenticated(true);
-    }
-  }
-
-  void _goHome() {
-    print('go home');
-    setState(() {
-      if(_authenticated == true) {
-   //     _screen = _settings;
-        Navigator.pushNamed(context,'/second');
-      }
-      else {
-    //    _screen = _login;
-      }
-    }
-    );
-  }
-  void _logout() {
-    print('log out');
-  }
-
-  void _setAuthenticated(bool auth) {
-    setState(() {
-      if(auth == true) {
-    //    _screen = _settings;
-        Navigator.pushNamed(context,'/second');
-        _title = 'Welcome';
-        _authenticated = true;
-      }
-      else {
-      //  _screen = _login;
-        _title = 'Please Login';
-        _authenticated = false;
-      }
-    }
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return new MaterialApp (
-      title: 'Login Demo',
-      home: new Scaffold(
-        appBar: new AppBar(
-          title: new Text(_title),
-          actions: <Widget>[
-            new IconButton(icon: new Icon(Icons.home),
-                onPressed: (){_goHome();}),
-            new IconButton(icon: new Icon(Icons.exit_to_app),
-                onPressed: (){_logout();}),
-          ],
-        ),
-        body: _login, // _screen,
-      ),
-    );
-  }
-}
-*/
