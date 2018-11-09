@@ -4,7 +4,7 @@ import 'package:nearby/login.dart';
 import 'package:english_words/english_words.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:image_picker/image_picker.dart';
+//import 'package:image_picker/image_picker.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -133,10 +133,28 @@ class ProfilePageFormState extends State<ProfilePageForm>{
   //
   // Note: This is a GlobalKey<FormState>, not a GlobalKey<MyCustomFormState>!
   final _formKey = GlobalKey<FormState>();
-  String _bioText = "Please enter a bio";
+  final _textController = TextEditingController();
 
-  void _updateBio(String s){
-    _bioText = s;
+  @override
+  void dispose(){
+    _textController.dispose();
+    super.dispose();
+  }
+  void _updateBio() async{
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    await Firestore.instance.collection('users').document(user.uid)
+        .updateData({'bio': _textController.text});
+  }
+
+  void _getBio() async{
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    var userBio = await Firestore.instance.collection('users').document(user.uid).get();
+    if (userBio.data.containsKey('bio')){
+      var _bioText = await Firestore.instance.collection('users').document(user.uid).get();
+      var _bioTextData = _bioText.data;
+      var test = _bioTextData['bio'];
+      print(test);
+    }
   }
 
   @override
@@ -153,13 +171,13 @@ class ProfilePageFormState extends State<ProfilePageForm>{
               border: InputBorder.none,
               hintText: 'Tell us a litle about yourself!',
             ),
+            controller: _textController,
             validator: (value) {
               if (value.isEmpty) {
                 return 'Please enter some text';
               }
             }, onFieldSubmitted: (value) {
-            _updateBio(value);
-          },
+            },
           ),
           Center(
 //            padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -169,6 +187,7 @@ class ProfilePageFormState extends State<ProfilePageForm>{
                 // the form is invalid.
                 if (_formKey.currentState.validate()) {
                   // If the form is valid, we want to show a Snackbar
+                  _updateBio();
                   Scaffold.of(context)
                       .showSnackBar(SnackBar(content: Text('Processing Data')));
                 }
