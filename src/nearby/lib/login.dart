@@ -5,6 +5,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 //import 'package:flutter/foundation.dart';
 
 var mAuth = FirebaseAuth.instance;
+FirebaseUser cUser = null;
+
+void updateCurrentUser() async{
+  cUser = await mAuth.currentUser();
+}
 
 class LoginPage extends StatefulWidget {
   @override
@@ -47,6 +52,7 @@ class _LoginPageState extends State<LoginPage> {
           print('waiting for firebase'); //debug test
           FirebaseUser user = await mAuth.signInWithEmailAndPassword(email: _email, password: _password);
           Navigator.pushNamed(context, '/home'); //if the user logs in with right credentials they're taken to the home screen
+          updateCurrentUser();
           print('Signed In: ${user.uid}');
         } else {
           print('waiting for firebase');
@@ -54,8 +60,9 @@ class _LoginPageState extends State<LoginPage> {
           UserUpdateInfo update = UserUpdateInfo();
           update.displayName = 'TestUser';
           user.updateProfile(update);
-          //Firestore.instance.collection('users').document(user.uid).setData({'bio': ''});
-
+          Firestore.instance.collection('users').document(user.uid).setData({'bio': ''});
+          Navigator.pushNamed(context, '/home');
+          updateCurrentUser();
           print('Registered user: ${user.uid}');
         }
       }

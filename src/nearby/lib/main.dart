@@ -4,6 +4,7 @@ import 'package:nearby/login.dart';
 import 'package:english_words/english_words.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:nearby/profile.dart';
 //import 'package:image_picker/image_picker.dart';
 
 void main() {
@@ -17,6 +18,7 @@ void main() {
       // When we navigate to the "/" route, build the Login Page
       '/home': (context) => HomePage(),
       '/profile': (context) => ProfilePage(),
+      '/profileEdit': (context) => ProfilePageEdit(),
       '/settings': (context) => settings(),
     },
   ));
@@ -102,101 +104,3 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class ProfilePage extends StatelessWidget{
-  @override
-  Widget build(BuildContext context){
-    final appTitle = 'Profile';
-    return MaterialApp(
-        title: appTitle,
-        home: Scaffold(
-          appBar: AppBar(
-            title: Text(appTitle),
-          ),
-          body: ProfilePageForm(),
-          floatingActionButton: new FloatingActionButton(
-            onPressed: () {Navigator.pushNamed(context, '/home');},
-            tooltip: 'Go to home page',
-            child: new Icon(Icons.home),
-          ),
-        )
-    );
-  }
-}
-
-class ProfilePageForm extends StatefulWidget {
-  ProfilePageFormState createState() { return ProfilePageFormState(); }
-}
-
-class ProfilePageFormState extends State<ProfilePageForm>{
-  // Create a global key that will uniquely identify the Form widget and allow
-  // us to validate the form
-  //
-  // Note: This is a GlobalKey<FormState>, not a GlobalKey<MyCustomFormState>!
-  final _formKey = GlobalKey<FormState>();
-  final _textController = TextEditingController();
-
-  @override
-  void dispose(){
-    _textController.dispose();
-    super.dispose();
-  }
-  void _updateBio() async{
-    FirebaseUser user = await FirebaseAuth.instance.currentUser();
-    await Firestore.instance.collection('users').document(user.uid)
-        .updateData({'bio': _textController.text});
-  }
-
-  void _getBio() async{
-    FirebaseUser user = await FirebaseAuth.instance.currentUser();
-    var userBio = await Firestore.instance.collection('users').document(user.uid).get();
-    if (userBio.data.containsKey('bio')){
-      var _bioText = await Firestore.instance.collection('users').document(user.uid).get();
-      var _bioTextData = _bioText.data;
-      var test = _bioTextData['bio'];
-      print(test);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // Build a Form widget using the _formKey we created above
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          TextFormField(
-            textAlign: TextAlign.center,
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              hintText: 'Tell us a litle about yourself!',
-            ),
-            controller: _textController,
-            validator: (value) {
-              if (value.isEmpty) {
-                return 'Please enter some text';
-              }
-            }, onFieldSubmitted: (value) {
-            },
-          ),
-          Center(
-//            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: RaisedButton(
-              onPressed: () {
-                // Validate will return true if the form is valid, or false if
-                // the form is invalid.
-                if (_formKey.currentState.validate()) {
-                  // If the form is valid, we want to show a Snackbar
-                  _updateBio();
-                  Scaffold.of(context)
-                      .showSnackBar(SnackBar(content: Text('Processing Data')));
-                }
-              },
-              child: Text('Submit'),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
