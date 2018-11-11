@@ -23,10 +23,10 @@ class _CreateSettingsPageState extends State<CreateSettingsPage> {
                     child: new Text('Notifications', style: new TextStyle(fontSize: 20.0)),
                     onPressed: () {Navigator.pushNamed(context,'/second');},
                   ),
-                  new RaisedButton (
-                    child: new Text('Location Sharing', style: new TextStyle(fontSize: 20.0)),
-                    onPressed: () {Navigator.pushNamed(context,'/second');},
-                  ),
+//                   new RaisedButton (
+//                     child: new Text('Location Sharing', style: new TextStyle(fontSize: 20.0)),
+//                     onPressed: () {Navigator.pushNamed(context,'/second');},
+//                   ),
                 ]
             )
         ),
