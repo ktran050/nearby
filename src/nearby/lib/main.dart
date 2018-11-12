@@ -25,8 +25,9 @@ void main() {
       // When we navigate to the "/" route, build the FirstScreen Widget
       '/second': (context) => HomePage(),
       // When we navigate to the "/second" route, build the SecondScreen Widget
-      '/third': (context) => ProfilePage(),
+//      '/third': (context) => ProfilePage(),
       '/createPost': (context) => CreatePostPage(),//../tePostPage(),
+      '/settings': (context) => CreateSettingsPage(),
     },
   ));
 }
@@ -34,30 +35,64 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text('Feed'),
-        ),
-        body: _buildList(context, dummySnapshot),
-        floatingActionButton: Row(
+    return MaterialApp(
+      home: DefaultTabController(
+        length: 3,
+        child: Scaffold(
+          appBar: AppBar(
+            bottom: TabBar(
+              tabs: [
+                Tab(icon: Icon(Icons.message)),
+                Tab(icon: Icon(Icons.group)),
+                Tab(icon: Icon(Icons.person)),
+              ],
+            ),
+            title: Text('Feed'),
+          ),
+          body: TabBarView(
+            children: [
+              new Text('Direct Messages here'),
+              _buildList(context, dummySnapshot),
+              _buildProfilePage(context),
+//              _buildProfilePage(context),
+            ],
+          ),
+          floatingActionButton: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
               FloatingActionButton(
                 heroTag: null,
-                onPressed: () { Navigator.pushNamed(context, '/third'); },
-                tooltip: 'Go to Profile',
-                child: new Icon(Icons.account_circle),
+                onPressed: () { Navigator.pushNamed(context, '/createPost'); },
+                tooltip: 'Create a Post',
+                child: new Icon(Icons.mode_edit/*account_circle*/),
               ),
               FloatingActionButton(
                 heroTag:null,
                 onPressed: () {Navigator.pushNamed(context,'/settings');},
                 tooltip: 'Go to Settings',
                 child: new Icon(Icons.settings),
-              )
-            ]
-        )
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
+
+  Widget _buildProfilePage(BuildContext context){
+    return  ProfilePageForm();
+  }
+
+//  Widget _buildBody(BuildContext context) {
+//    return StreamBuilder<QuerySnapshot>{
+//      stream: Firestore.instance.collection('posts').snapshots(),
+//      builder: (context, snapshot) {
+//        if(!snapshot.hasData) return LinearProgressIndicator();
+//
+//        return _buildList(context, snapshot.data.documents);
+//      },
+//    };
+//  }
 
   Widget _buildList(BuildContext context, List<Map> snapshot) {
     return ListView(
