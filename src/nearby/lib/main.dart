@@ -18,6 +18,7 @@ void main() {
       // When we navigate to the "/second" route, build the SecondScreen Widget
       '/third': (context) => ProfilePage(),
       '/createPost': (context) => CreatePostPage(),//../tePostPage(),
+      '/settings': (context) => CreateSettingsPage(),
     },
   ));
 }
