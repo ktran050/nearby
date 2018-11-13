@@ -33,10 +33,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
           update.displayName = 'LegacyUser';
           a.updateProfile(update);
         }
-        await Firestore.instance.collection('posts').document().setData({ 'name': a.displayName, 'post': _post});
+        await Firestore.instance.collection('posts').document().setData({ 'name': a.displayName, 'post': _post, 'votes': 0});
         print('added post to database');
         String name = a.displayName;
         print('Name = $name ');
+        Navigator.pop(context);
       }
       catch (e) {
         print('Error: $e');
