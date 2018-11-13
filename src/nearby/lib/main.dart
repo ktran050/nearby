@@ -25,9 +25,6 @@ void main() {
       // When we navigate to the "/" route, build the FirstScreen Widget
       '/second': (context) => HomePage(),
       // When we navigate to the "/second" route, build the SecondScreen Widget
-
-//      '/third': (context) => ProfilePage(),
-
       '/createPost': (context) => CreatePostPage(),//../tePostPage(),
       '/settings': (context) => CreateSettingsPage(),
     },
@@ -38,15 +35,27 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+
       home: DefaultTabController(
         length: 3,
+        initialIndex: 1,
         child: Scaffold(
           appBar: AppBar(
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(Icons.arrow_back),
+                onPressed:() { Navigator.pop(context);},
+              ),
+              IconButton(
+                icon: Icon(Icons.settings),
+                onPressed:() { Navigator.pushNamed(context, '/settings');},
+              )
+            ],
             bottom: TabBar(
               tabs: [
                 Tab(icon: Icon(Icons.message)),
                 Tab(icon: Icon(Icons.group)),
-                Tab(icon: Icon(Icons.person)),
+                Tab(icon: Icon(Icons.account_circle)),
               ],
             ),
             title: Text('Feed'),
@@ -54,27 +63,15 @@ class HomePage extends StatelessWidget {
           body: TabBarView(
             children: [
               new Text('Direct Messages here'),
-              _buildList(context, dummySnapshot),
+              _buildBody(context),
               _buildProfilePage(context),
-//              _buildProfilePage(context),
             ],
           ),
-          floatingActionButton: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: <Widget>[
-              FloatingActionButton(
-                heroTag: null,
-                onPressed: () { Navigator.pushNamed(context, '/createPost'); },
-                tooltip: 'Create a Post',
-                child: new Icon(Icons.mode_edit/*account_circle*/),
-              ),
-              FloatingActionButton(
-                heroTag:null,
-                onPressed: () {Navigator.pushNamed(context,'/settings');},
-                tooltip: 'Go to Settings',
-                child: new Icon(Icons.settings),
-              ),
-            ],
+          floatingActionButton: new FloatingActionButton(
+              heroTag: null,
+              onPressed: () { Navigator.pushNamed(context, '/createPost'); },
+              tooltip: 'Create a Post',
+              child: new Icon(Icons.mode_edit),
           ),
         ),
       ),
@@ -85,26 +82,26 @@ class HomePage extends StatelessWidget {
     return  ProfilePageForm();
   }
 
-//  Widget _buildBody(BuildContext context) {
-//    return StreamBuilder<QuerySnapshot>{
-//      stream: Firestore.instance.collection('posts').snapshots(),
-//      builder: (context, snapshot) {
-//        if(!snapshot.hasData) return LinearProgressIndicator();
-//
-//        return _buildList(context, snapshot.data.documents);
-//      },
-//    };
-//  }
+  Widget _buildBody(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: Firestore.instance.collection('posts').snapshots(),
+      builder: (context, snapshot) {
+        if(!snapshot.hasData) return LinearProgressIndicator();
 
-  Widget _buildList(BuildContext context, List<Map> snapshot) {
+        return _buildList(context, snapshot.data.documents);
+      },
+    );
+  }
+
+  Widget _buildList(BuildContext context, List<DocumentSnapshot> snapshot) {
     return ListView(
       padding: const EdgeInsets.only(top: 20.0),
       children: snapshot.map((data) => _buildListItem(context, data)).toList(),
     );
   }
 
-  Widget _buildListItem(BuildContext context, Map data) {
-    final record = Record.fromMap(data);
+  Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
+    final record = Record.fromSnapshot(data);
 
     return Padding(
       key: ValueKey(record.name),

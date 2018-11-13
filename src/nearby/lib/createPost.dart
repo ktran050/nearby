@@ -30,7 +30,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
       try{
         if (a.displayName == 'null') {
           UserUpdateInfo update = UserUpdateInfo();
-          update.displayName = 'TestUser';
+          update.displayName = 'LegacyUser';
           a.updateProfile(update);
         }
         await Firestore.instance.collection('posts').document().setData({ 'name': a.displayName, 'post': _post});
@@ -42,7 +42,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
         print('Error: $e');
       }
     }
-
   }
 
   @override
