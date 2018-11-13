@@ -22,6 +22,7 @@ class _LoginPageState extends State<LoginPage> {
 
   String _email;
   String _password;
+  String _displayName;
   FormType _formType = FormType.login;
 
   //checks validators in the widget below I.E. if the email and password is empty or not
@@ -49,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
           print('waiting for firebase');
           FirebaseUser user = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: _email, password: _password);
           UserUpdateInfo update = UserUpdateInfo();
-          update.displayName = 'TestUser';
+          update.displayName = _displayName;
           user.updateProfile(update);
           print('Registered user: ${user.uid}');
         }
@@ -77,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
     Widget build(BuildContext context) {
-      return new Scaffold(
+     return new Scaffold(
        appBar: new AppBar(
          title: new Text('Welcome'),
        ),
@@ -87,24 +88,48 @@ class _LoginPageState extends State<LoginPage> {
            key: formKey,
           child: new Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              new TextFormField(
-                decoration: new InputDecoration(labelText: 'Enter Email'),
-                validator: (input) => input.isEmpty ? '*required': null,
-                onSaved: (input) => _email = input,
-              ),
-              new TextFormField(
-                decoration: new InputDecoration(labelText: 'Enter Password'),
-                validator: (input) => input.isEmpty ? '*required': null,
-                onSaved: (input) => _password = input,
-                obscureText: true,
-              ),
-            ]
-            + buildLoginButtons(),
+            children: buildTextFields() + buildLoginButtons(),
           )
          )
        )
-      );
+     );
+  }
+
+  List<Widget> buildTextFields(){
+    if(_formType == FormType.login) {
+      return [
+        new TextFormField(
+          decoration: new InputDecoration(labelText: 'Enter Email'),
+          validator: (input) => input.isEmpty ? '*required' : null,
+          onSaved: (input) => _email = input,
+        ),
+        new TextFormField(
+          decoration: new InputDecoration(labelText: 'Enter Password'),
+          validator: (input) => input.isEmpty ? '*required' : null,
+          onSaved: (input) => _password = input,
+          obscureText: true,
+        ),
+      ];
+    } else {
+      return [
+        new TextFormField(
+          decoration: new InputDecoration(labelText: 'Enter Display Name'),
+          validator: (input) => input.isEmpty ? '*required' : null,
+          onSaved: (input) => _displayName = input,
+        ),
+        new TextFormField(
+          decoration: new InputDecoration(labelText: 'Enter Email'),
+          validator: (input) => input.isEmpty ? '*required' : null,
+          onSaved: (input) => _email = input,
+        ),
+        new TextFormField(
+          decoration: new InputDecoration(labelText: 'Enter Password'),
+          validator: (input) => input.isEmpty ? '*required' : null,
+          onSaved: (input) => _password = input,
+          obscureText: true,
+        ),
+      ];
+    }
   }
 
   //changes what the buttons say depending on the state
