@@ -6,26 +6,22 @@ import 'package:nearby/profilePage.dart';
 //import 'package:english_words/english_words.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 //
-final dummySnapshot = [
-  {"name": "Filip", "post": "hi", "votes": 15},
-  {"name": "Abraham", "post": "bruh", "votes": 14},
-  {"name": "Richard", "post": "hey", "votes": 11},
-  {"name": "Ike", "post": "sup", "votes": 10},
-  {"name": "Justin", "post": "yo", "votes": 1},
-];
+//final dummySnapshot = [
+//  {"name": "Filip", "post": "hi", "votes": 15},
+//  {"name": "Abraham", "post": "bruh", "votes": 14},
+//  {"name": "Richard", "post": "hey", "votes": 11},
+//  {"name": "Ike", "post": "sup", "votes": 10},
+//  {"name": "Justin", "post": "yo", "votes": 1},
+//];
 
 void main() {
   runApp(MaterialApp(
     title: 'Login with Routing Demo',
-    // Start the app with the "/" named route. In our case, the app will start
-    // on the FirstScreen Widget
     initialRoute: '/',
     routes: {
       '/': (context) => LoginPage(),
-      // When we navigate to the "/" route, build the FirstScreen Widget
       '/second': (context) => HomePage(),
-      // When we navigate to the "/second" route, build the SecondScreen Widget
-      '/createPost': (context) => CreatePostPage(),//../tePostPage(),
+      '/createPost': (context) => CreatePostPage(),
       '/settings': (context) => CreateSettingsPage(),
     },
   ));
@@ -89,13 +85,15 @@ class HomePage extends StatelessWidget {
     return ProfilePageForm();
   }
 
+//everything below here right now builds the feed
+
   //asks for a stream of documents from firebase
   Widget _buildBody(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('posts').snapshots(),
+      stream: Firestore.instance.collection('posts').snapshots(), //asks for documents in the 'posts' collections
       builder: (context, snapshot) {
         if (!snapshot.hasData)
-          return LinearProgressIndicator(); //if no posts show a loading bar
+          return LinearProgressIndicator(); //if no posts show a moving loading bar that takes up the whole screen
 
         return _buildList(context, snapshot.data.documents);
       },
@@ -111,8 +109,8 @@ class HomePage extends StatelessWidget {
 
   //tells flutter how to build each item in the list
   Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
-    //DocumentSnapshot
-    final record = Record.fromSnapshot(data); //fromSnapshot
+
+    final record = Record.fromSnapshot(data);
 
     return Padding(
       key: ValueKey(record.name),
@@ -135,13 +133,17 @@ class HomePage extends StatelessWidget {
                   children: <Widget>[
                     Expanded(
                       child: Text(record.post),
+                    ),IconButton(
+                      icon: Icon(Icons.arrow_drop_up),
+                      color: Colors.black,
+                      onPressed: () => record.reference.updateData({'votes': record.votes + 1}),
                     ),
-                    Text('${record.votes.toString()} '),
+                    Text('${record.votes.toString()}'),
 //                    buildIconButton(),
                     IconButton(
-                      icon: Icon(Icons.thumb_up),
+                      icon: Icon(Icons.arrow_drop_down),
                       color: Colors.black, //(_voted ? Colors.blue : Colors.black),
-                      onPressed: () => record.reference.updateData({'votes': record.votes + 1}),
+                      onPressed: () => record.reference.updateData({'votes': record.votes - 1}),
                     )
                   ],
                 ),
@@ -152,6 +154,28 @@ class HomePage extends StatelessWidget {
     );
   }
 }
+
+class Record {
+  final String name;
+  final String post;
+  final int votes;
+  final DocumentReference reference;
+
+  Record.fromMap(Map<String, dynamic> map, {this.reference})
+      : assert(map['name'] != null),
+        assert(map['post'] != null),
+        assert(map['votes'] != null),
+        name = map['name'],
+        post = map['post'],
+        votes = map['votes'];
+
+  Record.fromSnapshot(DocumentSnapshot snapshot)
+      : this.fromMap(snapshot.data, reference: snapshot.reference);
+
+  @override
+  String toString() => "Record<$name:$post>";
+}
+
 
 //class buildIconButton extends StatefulWidget {
 //  @override
@@ -184,23 +208,3 @@ class HomePage extends StatelessWidget {
 //  }
 //}
 
-class Record {
-  final String name;
-  final String post;
-  final int votes;
-  final DocumentReference reference;
-
-  Record.fromMap(Map<String, dynamic> map, {this.reference})
-      : assert(map['name'] != null),
-        assert(map['post'] != null),
-        assert(map['votes'] != null),
-        name = map['name'],
-        post = map['post'],
-        votes = map['votes'];
-
-  Record.fromSnapshot(DocumentSnapshot snapshot)
-      : this.fromMap(snapshot.data, reference: snapshot.reference);
-
-  @override
-  String toString() => "Record<$name:$post>";
-}
