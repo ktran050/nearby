@@ -5,14 +5,14 @@ import 'package:nearby/login.dart';
 import 'package:nearby/profilePage.dart';
 //import 'package:english_words/english_words.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-final dummySnapshot = [
-  {"name": "Donald Trump", "post": "Fake news"},
-  {"name": "Ethan Klein", "post": "Fascinating"},
-  {"name": "Steph Curry", "post": "What up big fella"},
-  {"name": "Brett Kavanaugh", "post": "I like beer"},
-  {"name": "Kyle Lowry", "post": "Yay ya hey "},
-];
+//
+//final dummySnapshot = [
+//  {"name": "Donald Trump", "post": "Fake news"},
+//  {"name": "Ethan Klein", "post": "Fascinating"},
+//  {"name": "Steph Curry", "post": "What up big fella"},
+//  {"name": "Brett Kavanaugh", "post": "I like beer"},
+//  {"name": "Kyle Lowry", "post": "Yay ya hey "},
+//];
 
 void main() {
   runApp(MaterialApp(
@@ -82,11 +82,12 @@ class HomePage extends StatelessWidget {
     return  ProfilePageForm();
   }
 
+  //asks for a stream of documents from firebase
   Widget _buildBody(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
       stream: Firestore.instance.collection('posts').snapshots(),
       builder: (context, snapshot) {
-        if(!snapshot.hasData) return LinearProgressIndicator();
+        if(!snapshot.hasData) return LinearProgressIndicator(); //if no posts show a loading bar
 
         return _buildList(context, snapshot.data.documents);
       },
@@ -100,6 +101,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
+  //tells flutter how to build each item in the list
   Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
     final record = Record.fromSnapshot(data);
 

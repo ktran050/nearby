@@ -30,11 +30,11 @@ class _CreateSettingsPageState extends State<CreateSettingsPage> {
               ]
           )
       ),
-      floatingActionButton: new FloatingActionButton(
-        onPressed: () {Navigator.pop(context);},
-        tooltip: 'Go to home page',
-        child: new Icon(Icons.home),
-      ),
+//      floatingActionButton: new FloatingActionButton(
+//        onPressed: () {Navigator.pop(context);},
+//        tooltip: 'Go to home page',
+//        child: new Icon(Icons.home),
+//      ),
     );
   }
 }
