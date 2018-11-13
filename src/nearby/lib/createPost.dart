@@ -9,41 +9,68 @@ class CreatePostPage extends StatefulWidget {
 
 class _CreatePostPageState extends State<CreatePostPage> {
 
+  final postFormKey = new GlobalKey<FormState>();
+
+  String _post;
+
+  bool validatePost(FirebaseUser user){
+    final form = postFormKey.currentState;
+    if(form.validate()){
+      form.save();
+      print('Valid Post by ${user.displayName}');
+      return true;
+    }
+    return false;
+  }
+
   //test func to add a post to our database
   void addToDatabase() async{
     FirebaseUser a = await FirebaseAuth.instance.currentUser();
-//    await Firestore.instance.collection('posts').document().setData({ 'title': 'yaboy\'s post', 'author': a.displayName});
-//    print('added to database');
-    if (a.displayName == 'null') {
-      UserUpdateInfo update = UserUpdateInfo();
-      update.displayName = 'TestUser';
-      a.updateProfile(update);
-    }
-    String name = a.displayName;
-    print('Name = $name ');
+    if(validatePost(a)) {
+      try{
+        if (a.displayName == 'null') {
+          UserUpdateInfo update = UserUpdateInfo();
+          update.displayName = 'TestUser';
+          a.updateProfile(update);
+        }
+        await Firestore.instance.collection('posts').document().setData({ 'name': a.displayName, 'post': _post});
+        print('added post to database');
+        String name = a.displayName;
+        print('Name = $name ');
+      }
+      catch (e) {
+        print('Error: $e');
+      }
     }
 
+  }
+
   @override
-    Widget build(BuildContext context) {
-      return new Scaffold(
+  Widget build(BuildContext context) {
+    return new Scaffold(
         appBar: new AppBar(
           title: new Text('Create Post'),
         ),
         body: new Container(
-          padding: EdgeInsets.all(16.0),
-          child: new Column(
+            padding: EdgeInsets.all(16.0),
+            child: new Form(
+              key: postFormKey,
+              child: new Column(
 //            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget> [
-              new TextField(
-                decoration: new InputDecoration(labelText: 'Write Post'),
-              ),
-              new RaisedButton (
-                child: new Text('Post', style: new TextStyle(fontSize: 20.0)),
-                onPressed: addToDatabase,
+                children: <Widget> [
+                  new TextFormField(
+                    decoration: new InputDecoration(labelText: 'Write Post'),
+                    validator: (input) => input.isEmpty ? '*Can\'t be empty' : null,
+                    onSaved: (input) => _post = input,
+                  ),
+                  new RaisedButton (
+                    child: new Text('Post', style: new TextStyle(fontSize: 20.0)),
+                    onPressed: addToDatabase,
+                  )
+                ]
               )
-            ]
-          )
+            )
         )
-      );
+    );
   }
 }
