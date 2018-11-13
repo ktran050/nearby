@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'package:nearby/settings.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -46,29 +48,36 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-        appBar: new AppBar(
-          title: new Text('Create Post'),
-        ),
-        body: new Container(
-            padding: EdgeInsets.all(16.0),
-            child: new Form(
-              key: postFormKey,
-              child: new Column(
-//            crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget> [
-                  new TextFormField(
-                    decoration: new InputDecoration(labelText: 'Write Post'),
-                    validator: (input) => input.isEmpty ? '*Can\'t be empty' : null,
-                    onSaved: (input) => _post = input,
-                  ),
-                  new RaisedButton (
-                    child: new Text('Post', style: new TextStyle(fontSize: 20.0)),
-                    onPressed: addToDatabase,
+    return StreamBuilder(
+        stream: bloc.darkThemeEnabled,
+        initialData: false,
+        builder: (context,snapshot)=> MaterialApp(
+          theme: snapshot.data?ThemeData.dark():ThemeData.light(),
+          home: Scaffold(
+              appBar: new AppBar(
+                title: new Text('Create Post'),
+              ),
+              body: new Container(
+                  padding: EdgeInsets.all(16.0),
+                  child: new Form(
+                    key: postFormKey,
+                    child: new Column(
+      //            crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget> [
+                        new TextFormField(
+                          decoration: new InputDecoration(labelText: 'Write Post'),
+                          validator: (input) => input.isEmpty ? '*Can\'t be empty' : null,
+                          onSaved: (input) => _post = input,
+                        ),
+                        new RaisedButton (
+                          child: new Text('Post', style: new TextStyle(fontSize: 20.0)),
+                          onPressed: addToDatabase,
+                        )
+                      ]
+                    )
                   )
-                ]
               )
-            )
+          )
         )
     );
   }

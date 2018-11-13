@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:nearby/settings.dart';
 import 'package:nearby/createPost.dart';
 import 'package:nearby/login.dart';
@@ -34,7 +35,11 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return StreamBuilder(
+        stream: bloc.darkThemeEnabled,
+        initialData: false,
+        builder: (context,snapshot)=> MaterialApp(
+      theme: snapshot.data?ThemeData.dark():ThemeData.light(),
 
       home: DefaultTabController(
         length: 3,
@@ -75,6 +80,7 @@ class HomePage extends StatelessWidget {
           ),
         ),
       ),
+        )
     );
   }
 
