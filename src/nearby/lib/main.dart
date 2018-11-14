@@ -65,7 +65,7 @@ class HomePage extends StatelessWidget {
   //test func to add a post to our database
   void addToDatabase() async{
     FirebaseUser a = await FirebaseAuth.instance.currentUser(); //Added line
-    await Firestore.instance.collection('posts').document().setData({ 'title': 'yaboy\'s post', 'author': a.displayName});
+    await Firestore.instance.collection('posts').document().setData({ 'title': 'yaboy\'s post', 'author': cUser.uid});
 
     print('added to database');
   }
