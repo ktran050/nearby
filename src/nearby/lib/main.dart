@@ -3,6 +3,7 @@ import 'package:nearby/settings.dart';
 import 'package:nearby/createPost.dart';
 import 'package:nearby/login.dart';
 import 'package:nearby/profilePage.dart';
+import 'package:nearby/commentPage.dart';
 //import 'package:english_words/english_words.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 //
@@ -23,6 +24,7 @@ void main() {
       '/second': (context) => HomePage(),
       '/createPost': (context) => CreatePostPage(),
       '/settings': (context) => CreateSettingsPage(),
+      '/commentPage': (context) => commentPage(),
     },
   ));
 }
@@ -31,51 +33,48 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-
-      home: DefaultTabController(
-        length: 3,
-        initialIndex: 1,
-        child: Scaffold(
-          appBar: AppBar(
-            actions: <Widget>[
-              IconButton(
-                icon: Icon(Icons.arrow_back),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              IconButton(
-                icon: Icon(Icons.settings),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/settings');
-                },
-              )
-            ],
-            bottom: TabBar(
-              tabs: [
-                Tab(icon: Icon(Icons.message)),
-                Tab(icon: Icon(Icons.group)),
-                Tab(icon: Icon(Icons.account_circle)),
-              ],
+   return DefaultTabController(
+      length: 3,
+      initialIndex: 1,
+      child: Scaffold(
+        appBar: AppBar(
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.pop(context);
+              },
             ),
-            title: Text('Feed'),
-          ),
-          body: TabBarView(
-            children: [
-              new Text('Direct Messages here'),
-              _buildBody(context),
-              _buildProfilePage(context),
+            IconButton(
+              icon: Icon(Icons.settings),
+              onPressed: () {
+                Navigator.pushNamed(context, '/settings');
+              },
+            )
+          ],
+          bottom: TabBar(
+            tabs: [
+              Tab(icon: Icon(Icons.message)),
+              Tab(icon: Icon(Icons.group)),
+              Tab(icon: Icon(Icons.account_circle)),
             ],
           ),
-          floatingActionButton: new FloatingActionButton(
-            heroTag: null,
-            onPressed: () {
-              Navigator.pushNamed(context, '/createPost');
-            },
-            tooltip: 'Create a Post',
-            child: new Icon(Icons.mode_edit),
-          ),
+          title: Text('Feed'),
+        ),
+        body: TabBarView(
+          children: [
+            new Text('Direct Messages here'),
+            _buildBody(context),
+            _buildProfilePage(context),
+          ],
+        ),
+        floatingActionButton: new FloatingActionButton(
+          heroTag: null,
+          onPressed: () {
+            Navigator.pushNamed(context, '/createPost');
+          },
+          tooltip: 'Create a Post',
+          child: new Icon(Icons.mode_edit),
         ),
       ),
     );
@@ -121,34 +120,40 @@ class HomePage extends StatelessWidget {
           borderRadius: BorderRadius.circular(5.0),
         ),
         child: Column(
-            children: <Widget>[
-              ListTile(
-                title: Text(record.name),
-                subtitle: Text('<Location>'),
-                trailing: Text('<Time>'),
+          children: <Widget>[
+            ListTile(
+              title: Text(record.name),
+              subtitle: Text('<Location>,<Time>'),
+              trailing: IconButton(
+                icon: Icon(Icons.add_comment),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/commentPage');
+                },
               ),
-              Container(
-                padding: const EdgeInsets.all(12.0),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(record.post),
-                    ),IconButton(
-                      icon: Icon(Icons.arrow_drop_up),
-                      color: Colors.black,
-                      onPressed: () => record.reference.updateData({'votes': record.votes + 1}),
-                    ),
-                    Text('${record.votes.toString()}'),
+            ),
+            Container(
+              padding: const EdgeInsets.all(12.0),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Text(record.post),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.arrow_drop_up),
+                    color: Colors.black,
+                    onPressed: () => record.reference.updateData({'votes': record.votes + 1}),
+                  ),
+                  Text('${record.votes.toString()}'),
 //                    buildIconButton(),
-                    IconButton(
-                      icon: Icon(Icons.arrow_drop_down),
-                      color: Colors.black, //(_voted ? Colors.blue : Colors.black),
-                      onPressed: () => record.reference.updateData({'votes': record.votes - 1}),
-                    )
-                  ],
-                ),
+                  IconButton(
+                    icon: Icon(Icons.arrow_drop_down),
+                    color: Colors.black, //(_voted ? Colors.blue : Colors.black),
+                    onPressed: () => record.reference.updateData({'votes': record.votes - 1}),
+                  )
+                ],
               ),
-            ],
+            ),
+          ],
         ),
       ),
     );

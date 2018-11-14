@@ -52,6 +52,7 @@ class _LoginPageState extends State<LoginPage> {
           UserUpdateInfo update = UserUpdateInfo();
           update.displayName = _displayName;
           user.updateProfile(update);
+          Navigator.pushNamed(context, '/second');
           print('Registered user: ${user.uid}');
         }
       }

@@ -33,10 +33,10 @@ class _CreatePostPageState extends State<CreatePostPage> {
           update.displayName = 'LegacyUser';
           a.updateProfile(update);
         }
-        await Firestore.instance.collection('posts').document().setData({ 'name': a.displayName, 'post': _post, 'votes': 0});
+        await Firestore.instance.collection('posts').document().setData({ 'name': a.displayName, 'post': _post, 'votes': 0, 'date': DateTime.now()});
         print('added post to database');
         String name = a.displayName;
-        print('Name = $name ');
+        print('Date = $name ');
         Navigator.pop(context);
       }
       catch (e) {
@@ -44,6 +44,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
       }
     }
   }
+
+//  void DateTimeTest() {
+//    var Date = DateTime.now();
+//    print('Date: $Date');
+//  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +71,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
                   new RaisedButton (
                     child: new Text('Post', style: new TextStyle(fontSize: 20.0)),
                     onPressed: addToDatabase,
-                  )
+                  ),
+//                  new RaisedButton (
+//                    child: new Text('DateTimeTest', style: new TextStyle(fontSize: 20.0)),
+//                    onPressed: DateTimeTest,
+//                  )
                 ]
               )
             )
