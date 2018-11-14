@@ -4,16 +4,7 @@ import 'package:nearby/createPost.dart';
 import 'package:nearby/login.dart';
 import 'package:nearby/profilePage.dart';
 import 'package:nearby/commentPage.dart';
-//import 'package:english_words/english_words.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-//
-//final dummySnapshot = [
-//  {"name": "Filip", "post": "hi", "votes": 15},
-//  {"name": "Abraham", "post": "bruh", "votes": 14},
-//  {"name": "Richard", "post": "hey", "votes": 11},
-//  {"name": "Ike", "post": "sup", "votes": 10},
-//  {"name": "Justin", "post": "yo", "votes": 1},
-//];
 
 void main() {
   runApp(MaterialApp(
@@ -21,10 +12,11 @@ void main() {
     initialRoute: '/',
     routes: {
       '/': (context) => LoginPage(),
-      '/second': (context) => HomePage(),
+      '/home': (context) => HomePage(),
       '/createPost': (context) => CreatePostPage(),
       '/settings': (context) => CreateSettingsPage(),
       '/commentPage': (context) => commentPage(),
+      '/profileEdit': (context) => ProfilePageForm(),
     },
   ));
 }
@@ -89,7 +81,7 @@ class HomePage extends StatelessWidget {
   }//Widget
 
   Widget _buildProfilePage(BuildContext context) {
-    return ProfilePageForm();
+    return ProfilePage();
   }
 
 //everything below here right now builds the feed
@@ -152,7 +144,6 @@ class HomePage extends StatelessWidget {
                     onPressed: () => record.reference.updateData({'votes': record.votes + 1}),
                   ),
                   Text('${record.votes.toString()}'),
-//                    buildIconButton(),
                   IconButton(
                     icon: Icon(Icons.arrow_drop_down),
                     color: Colors.black, //(_voted ? Colors.blue : Colors.black),

@@ -52,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
         if(_formType == FormType.login) {
           print('waiting for firebase'); //debug test
           FirebaseUser user = await mAuth.signInWithEmailAndPassword(email: _email, password: _password);
-          Navigator.pushNamed(context, '/second'); //if the user logs in with right credentials they're taken to the home screen
+          Navigator.pushNamed(context, '/home'); //if the user logs in with right credentials they're taken to the home screen
           updateCurrentUser();
           print('Signed In: ${user.uid}');
         } else {
@@ -63,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
           user.updateProfile(update);
           Firestore.instance.collection('users').document(user.uid).setData({'bio': ''});
           updateCurrentUser();
-          Navigator.pushNamed(context, '/second');
+          Navigator.pushNamed(context, '/home');
           print('Registered user: ${user.uid}');
         }
       }
