@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nearby/settings.dart';
 import 'package:nearby/createPost.dart';
 import 'package:nearby/login.dart';
-import 'package:nearby/profilePage.dart';
+import 'package:nearby/profile.dart';
 import 'package:nearby/commentPage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
