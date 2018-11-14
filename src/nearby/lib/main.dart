@@ -33,52 +33,60 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-   return DefaultTabController(
-      length: 3,
-      initialIndex: 1,
-      child: Scaffold(
-        appBar: AppBar(
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.arrow_back),
-              onPressed: () {
-                Navigator.pop(context);
-              },
+    return StreamBuilder(
+      stream: bloc.darkThemeEnabled,
+      initialData: false,
+      builder: (context,snapshot)=> MaterialApp(
+        theme: snapshot.data?ThemeData.dark():ThemeData.light(),
+
+        home: DefaultTabController(
+          length: 3,
+          initialIndex: 1,
+          child: Scaffold(
+            appBar: AppBar(
+              actions: <Widget>[
+                IconButton(
+                  icon: Icon(Icons.arrow_back),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.settings),
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/settings');
+                  },
+                )
+              ],
+              bottom: TabBar(
+                tabs: [
+                  Tab(icon: Icon(Icons.message)),
+                  Tab(icon: Icon(Icons.group)),
+                  Tab(icon: Icon(Icons.account_circle)),
+                ],
+              ),
+              title: Text('Feed'),
             ),
-            IconButton(
-              icon: Icon(Icons.settings),
+            body: TabBarView(
+              children: [
+                new Text('Direct Messages here'),
+                _buildBody(context),
+                _buildProfilePage(context),
+              ],
+            ),
+            floatingActionButton: new FloatingActionButton(
+              heroTag: null,
               onPressed: () {
-                Navigator.pushNamed(context, '/settings');
+                Navigator.pushNamed(context, '/createPost');
               },
-            )
-          ],
-          bottom: TabBar(
-            tabs: [
-              Tab(icon: Icon(Icons.message)),
-              Tab(icon: Icon(Icons.group)),
-              Tab(icon: Icon(Icons.account_circle)),
-            ],
-          ),
-          title: Text('Feed'),
-        ),
-        body: TabBarView(
-          children: [
-            new Text('Direct Messages here'),
-            _buildBody(context),
-            _buildProfilePage(context),
-          ],
-        ),
-        floatingActionButton: new FloatingActionButton(
-          heroTag: null,
-          onPressed: () {
-            Navigator.pushNamed(context, '/createPost');
-          },
-          tooltip: 'Create a Post',
-          child: new Icon(Icons.mode_edit),
-        ),
-      ),
-    );
-  }
+              tooltip: 'Create a Post',
+              child: new Icon(Icons.mode_edit),
+            ),//floatingActionButton
+          ),//Scaffold
+        ),//TabController
+      ),//MaterialApp
+    );//StreamBuilder
+  }//Widget
 
   Widget _buildProfilePage(BuildContext context) {
     return ProfilePageForm();
