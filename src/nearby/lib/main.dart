@@ -30,7 +30,9 @@ class HomePage extends StatelessWidget {
       initialData: false,
       builder: (context,snapshot)=> MaterialApp(
         theme: snapshot.data?ThemeData.dark():ThemeData.light(),
-
+        routes: {
+          '/commentPage': (context) => commentPage(),
+        },
         home: DefaultTabController(
           length: 3,
           initialIndex: 1,
