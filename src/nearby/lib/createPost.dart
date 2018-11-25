@@ -26,6 +26,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
   //test func to add a post to our database
   void addToDatabase() async{
     FirebaseUser a = await FirebaseAuth.instance.currentUser();
+    var epoch = new DateTime.utc(1970, 1, 1);
     if(validatePost(a)) {
       try{
         if (a.displayName == 'null') {
@@ -33,7 +34,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
           update.displayName = 'LegacyUser';
           a.updateProfile(update);
         }
-        await Firestore.instance.collection('posts').document().setData({ 'name': a.displayName, 'post': _post, 'votes': 0, 'date': DateTime.now()});
+        await Firestore.instance.collection('posts').document().setData({
+          'name': a.displayName,
+          'post': _post, 'votes': 0,
+          'date': DateTime.now().difference(epoch).inSeconds,
+        });
         print('added post to database');
         String name = a.displayName;
         print('Date = $name ');

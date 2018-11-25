@@ -4,6 +4,7 @@ import 'package:nearby/createPost.dart';
 import 'package:nearby/login.dart';
 import 'package:nearby/profile.dart';
 import 'package:nearby/commentPage.dart';
+import 'package:nearby/record.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() {
@@ -30,6 +31,9 @@ class HomePage extends StatelessWidget {
       initialData: false,
       builder: (context,snapshot)=> MaterialApp(
         theme: snapshot.data?ThemeData.dark():ThemeData.light(),
+        routes: {
+          '/commentPage': (context) => commentPage(),
+        },
 
         home: DefaultTabController(
           length: 3,
@@ -89,7 +93,7 @@ class HomePage extends StatelessWidget {
   //asks for a stream of documents from firebase
   Widget _buildBody(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('posts').snapshots(), //asks for documents in the 'posts' collections
+      stream: Firestore.instance.collection('posts').orderBy("date", descending: true).snapshots(), //asks for documents in the 'posts' collections
       builder: (context, snapshot) {
         if (!snapshot.hasData)
           return LinearProgressIndicator(); //if no posts show a moving loading bar that takes up the whole screen
@@ -127,7 +131,12 @@ class HomePage extends StatelessWidget {
               trailing: IconButton(
                 icon: Icon(Icons.add_comment),
                 onPressed: () {
-                  Navigator.pushNamed(context, '/commentPage');
+//                  Navigator.pushNamed(context, '/commentPage');
+                    var route = new MaterialPageRoute(
+                      builder: (BuildContext context) =>
+                          new commentPage(record: record),
+                    );
+                    Navigator.of(context).push(route);
                 },
               ),
             ),
@@ -158,28 +167,6 @@ class HomePage extends StatelessWidget {
     );
   }
 }
-
-class Record {
-  final String name;
-  final String post;
-  final int votes;
-  final DocumentReference reference;
-
-  Record.fromMap(Map<String, dynamic> map, {this.reference})
-      : assert(map['name'] != null),
-        assert(map['post'] != null),
-        assert(map['votes'] != null),
-        name = map['name'],
-        post = map['post'],
-        votes = map['votes'];
-
-  Record.fromSnapshot(DocumentSnapshot snapshot)
-      : this.fromMap(snapshot.data, reference: snapshot.reference);
-
-  @override
-  String toString() => "Record<$name:$post>";
-}
-
 
 //class buildIconButton extends StatefulWidget {
 //  @override
