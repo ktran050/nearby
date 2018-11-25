@@ -74,7 +74,10 @@ class HomePage extends StatelessWidget {
             floatingActionButton: new FloatingActionButton(
               heroTag: null,
               onPressed: () {
-                Navigator.pushNamed(context, '/createPost');
+                Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                    new CreatePostPage(postType: PostType.post),
+                ));
               },
               tooltip: 'Create a Post',
               child: new Icon(Icons.mode_edit),
@@ -84,8 +87,6 @@ class HomePage extends StatelessWidget {
       ),//MaterialApp
     );//StreamBuilder
   }//Widget
-
-//everything below here right now builds the feed
 
   //asks for a stream of documents from firebase
   Widget _buildBody(BuildContext context) {

@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:nearby/record.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class CreatePostPage extends StatefulWidget {
+
+  final Record record;
+  final PostType postType;
+
+  //constructor with optional parameters(doesnt pass in a record if making a post from the feed)
+  CreatePostPage({Key key, this.record, this.postType}) : super (key: key);
+
   @override
   State<StatefulWidget> createState() => new _CreatePostPageState();
 }
@@ -35,17 +43,28 @@ class _CreatePostPageState extends State<CreatePostPage> {
           a.updateProfile(update);
         }
 //        var doc = Firestore.instance.collection('posts').document();
-        await Firestore.instance.collection('posts').document().setData({
-          'name': a.displayName,
-          'post': _post,
-          'votes': 0,
-          'date': DateTime.now().difference(epoch).inSeconds,
-          'comments': 0,
-        });
-        print('added post to database');
-        String name = a.displayName;
-        print('Date = $name ');
-        Navigator.pop(context);
+        if(widget.postType == PostType.post) {
+          await Firestore.instance.collection('posts').document().setData({
+            'name': a.displayName,
+            'post': _post,
+            'votes': 0,
+            'date': DateTime.now().difference(epoch).inSeconds,
+            'comments': 0,
+          });
+          String name = a.displayName;
+          print('added post by $name to database');
+          Navigator.pop(context);
+        } else {
+          await widget.record.reference.collection('comments').document().setData({
+            'name': a.displayName,
+            'post': _post,
+            'votes': 0,
+            'date': DateTime.now().difference(epoch).inSeconds,
+            'comments': 0,
+          });
+          widget.record.reference.updateData({'comments': widget.record.comments + 1});
+          Navigator.pop(context);
+        }
       }
       catch (e) {
         print('Error: $e');
@@ -62,7 +81,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
   Widget build(BuildContext context) {
     return new Scaffold(
         appBar: new AppBar(
-          title: new Text('Create Post'),
+          title: widget.postType == PostType.post ? new Text('Create Post') : new Text('Create Comment'),
         ),
         body: new Container(
             padding: EdgeInsets.all(16.0),
