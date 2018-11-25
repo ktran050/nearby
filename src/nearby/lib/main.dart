@@ -67,7 +67,8 @@ class HomePage extends StatelessWidget {
               children: [
                 new Text('Direct Messages here'),
                 _buildBody(context),
-                _buildProfilePage(context),
+//                _buildProfilePage(context),
+                ProfilePage(),
               ],
             ),
             floatingActionButton: new FloatingActionButton(
@@ -84,10 +85,6 @@ class HomePage extends StatelessWidget {
     );//StreamBuilder
   }//Widget
 
-  Widget _buildProfilePage(BuildContext context) {
-    return ProfilePage();
-  }
-
 //everything below here right now builds the feed
 
   //asks for a stream of documents from firebase
@@ -98,17 +95,21 @@ class HomePage extends StatelessWidget {
         if (!snapshot.hasData)
           return LinearProgressIndicator(); //if no posts show a moving loading bar that takes up the whole screen
 
-        return _buildList(context, snapshot.data.documents);
+//        return _buildList(context, snapshot.data.documents);
+        return ListView(
+          padding: const EdgeInsets.only(top: 20.0),
+          children: snapshot.data.documents.map((data) => _buildListItem(context, data)).toList(),
+        );
       },
     );
   }
 
-  Widget _buildList(BuildContext context, List<DocumentSnapshot> snapshot) {
-    return ListView(
-      padding: const EdgeInsets.only(top: 20.0),
-      children: snapshot.map((data) => _buildListItem(context, data)).toList(),
-    );
-  }
+//  Widget _buildList(BuildContext context, List<DocumentSnapshot> snapshot) {
+//    return ListView(
+//      padding: const EdgeInsets.only(top: 20.0),
+//      children: snapshot.map((data) => _buildListItem(context, data)).toList(),
+//    );
+//  }
 
   //tells flutter how to build each item in the list
   Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
@@ -128,6 +129,14 @@ class HomePage extends StatelessWidget {
             ListTile(
               title: Text(record.name),
               subtitle: Text('<Location>,<Time>'),
+            ),
+            Container(
+              child: Text(record.post),
+              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
+              alignment: Alignment.topLeft,
+            ),
+            ListTile(
+              title: buildVoteButton(record: record),
               trailing: IconButton(
                 icon: Icon(Icons.add_comment),
                 onPressed: () {
@@ -137,65 +146,87 @@ class HomePage extends StatelessWidget {
                           new commentPage(record: record),
                     );
                     Navigator.of(context).push(route);
-                },
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(12.0),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Text(record.post),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.arrow_drop_up),
-                    color: Colors.black,
-                    onPressed: () => record.reference.updateData({'votes': record.votes + 1}),
-                  ),
-                  Text('${record.votes.toString()}'),
-                  IconButton(
-                    icon: Icon(Icons.arrow_drop_down),
-                    color: Colors.black, //(_voted ? Colors.blue : Colors.black),
-                    onPressed: () => record.reference.updateData({'votes': record.votes - 1}),
-                  )
-                ],
-              ),
-            ),
-          ],
+                }, //onPressed
+              ),//IconButton
+            ),//ListTile
+          ],//Widget
+        ),//Column
+      ),//Container
+    );//Padding
+  }//BuildListItem
+}//HomePage
+
+enum Vote{
+  notVoted,
+  upvoted,
+  downvoted,
+}
+
+class buildVoteButton extends StatefulWidget {
+  final Record record;
+
+  buildVoteButton({Key key, this.record}) : super (key: key);
+
+  @override
+  State<StatefulWidget> createState() => new _buildVoteButtonState();
+}
+
+class _buildVoteButtonState extends State<buildVoteButton> {
+
+  Vote _vote = Vote.notVoted; //ideally would pull from firestore
+
+  void upVote(){
+    if(_vote == Vote.upvoted){
+      widget.record.reference.updateData({'votes': widget.record.votes - 1});
+      setState((){
+        _vote = Vote.notVoted;
+      });
+    } else {
+      if(_vote == Vote.downvoted) {
+        widget.record.reference.updateData({'votes': widget.record.votes + 2});
+      } else {
+        widget.record.reference.updateData({'votes': widget.record.votes + 1});
+      }
+      setState((){
+        _vote = Vote.upvoted;
+      });
+    }
+  }
+
+  void downVote(){
+    if(_vote == Vote.downvoted){
+      widget.record.reference.updateData({'votes': widget.record.votes + 1});
+      setState((){
+        _vote = Vote.notVoted;
+      });
+    } else {
+      if(_vote == Vote.upvoted) {
+        widget.record.reference.updateData({'votes': widget.record.votes - 2});
+      } else {
+        widget.record.reference.updateData({'votes': widget.record.votes - 1});
+      }
+      setState((){
+        _vote = Vote.downvoted;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new Row(
+      children: <Widget> [
+        IconButton(
+          icon: Icon(Icons.arrow_drop_up),
+          color: ((_vote == Vote.upvoted) ? Colors.orange : Colors.black),
+          onPressed: () => upVote(),
         ),
-      ),
+        Text('${widget.record.votes.toString()}'),
+        IconButton(
+          icon: Icon(Icons.arrow_drop_down),
+          color: ((_vote == Vote.downvoted) ? Colors.blue : Colors.black),
+          onPressed: () => downVote(),
+        )
+      ],
     );
   }
 }
-
-//class buildIconButton extends StatefulWidget {
-//  @override
-//  _buildIconButtonState createState() => _buildIconButtonState();
-//}
-//
-//class _buildIconButtonState extends State<buildIconButton> {
-//
-//  bool _voted = false;
-//
-//  void _toggleVote() {
-//    setState(() {
-//      if (_voted) {
-//        record.reference.updateData({'votes': record.votes - 1});
-//        _voted = false;
-//      } else {
-//        record.reference.updateData({'votes': record.votes + 1});
-//        _voted = true;
-//      }
-//    });
-//  }
-//
-//  @override
-//  Widget build(BuildContext context) {
-//    return IconButton(
-//      icon: Icon(Icons.thumb_up),
-//      color: (_voted ? Colors.blue : Colors.black),
-//      onPressed: _toggleVote,
-//    );
-//  }
-//}
-
