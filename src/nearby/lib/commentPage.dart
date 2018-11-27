@@ -51,35 +51,85 @@ class _commentPageState extends State<commentPage> {
         title: new Text('Comments'),
       ),
       body: buildCommentsList(context),
+      floatingActionButton: new FloatingActionButton(
+        heroTag: null,
+        onPressed: () {
+          Navigator.of(context).push(new MaterialPageRoute(
+            builder: (BuildContext context) =>
+            new CreatePostPage(record: widget.record, postType: PostType.comment),
+          ));
+        },
+        tooltip: 'Make a Comment',
+        child: new Icon(Icons.add_comment),
+      ),//floatingActionButton
     );
   }
 
   Widget buildCommentsList(BuildContext context){
     if(_comments == Comments.none) {
-      return new Container(
-        alignment: Alignment.center,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget> [
-            new Container (
-  //            alignment: Alignment(0.0,-0.4),
-              child: Text('No Comments :/',
-                style: TextStyle(fontSize: 20.0),
-                textAlign: TextAlign.center,
-              )
-            ),
-            new Container (
-  //            alignment: Alignment(0.0, 0.2),
-              child: RaisedButton (
-                child: new Text('Add a Comment', style: new TextStyle(fontSize: 20.0)),
-                onPressed: addComment,
-              )
-            ),
-          ]
+      return new Container (
+        alignment: Alignment(0.0,-0.3),
+        child: Text('No Comments :/',
+          style: TextStyle(fontSize: 20.0),
+          textAlign: TextAlign.center,
         )
       );
     } else {
-      return new Text('There\'s Comments...');
+      return StreamBuilder<QuerySnapshot>(
+        stream: widget.record.reference.collection('comments').orderBy('date', descending: true).snapshots(),
+        builder: (context, snapshot) {
+          if(!snapshot.hasData)
+            return LinearProgressIndicator();
+
+          return ListView(
+            padding: const EdgeInsets.only(top:20.0),
+            children: snapshot.data.documents.map((data) => _buildListItem(context,data)).toList(),
+          );
+        }
+      );
     }
   }
+
+  Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
+
+    final record = Record.fromSnapshot(data);
+
+    return Padding(
+      key: ValueKey(record.name),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey),
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        child: Column(
+          children: <Widget>[
+            ListTile(
+              title: Text(record.name),
+              subtitle: Text('<Location>,<Time>'),
+            ),
+            Container(
+              child: Text(record.post),
+              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
+              alignment: Alignment.topLeft,
+            ),
+            ListTile(
+              title: buildVoteButton(record: record),
+              trailing: IconButton(
+                icon: Icon(Icons.add_comment),
+                onPressed: () {
+//                  Navigator.pushNamed(context, '/commentPage');
+                  var route = new MaterialPageRoute(
+                    builder: (BuildContext context) =>
+                    new commentPage(record: record),
+                  );
+                  Navigator.of(context).push(route);
+                }, //onPressed
+              ),//IconButton
+            ),//ListTile
+          ],//Widget
+        ),//Column
+      ),//Container
+    );//Padding
+  }//BuildListItem
 }

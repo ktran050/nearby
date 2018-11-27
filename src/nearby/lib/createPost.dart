@@ -6,6 +6,8 @@ import 'package:location/location.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
 
+DateTime epoch = new DateTime(1970, 1, 1);
+
 class CreatePostPage extends StatefulWidget {
 
   final Record record;
@@ -57,7 +59,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
     return false;
   }
 
-  //test func to add a post to our database
   void addToDatabase() async{
     FirebaseUser a = await FirebaseAuth.instance.currentUser();
     var epoch = new DateTime.utc(1970, 1, 1);
@@ -110,28 +111,24 @@ class _CreatePostPageState extends State<CreatePostPage> {
           title: widget.postType == PostType.post ? new Text('Create Post') : new Text('Create Comment'),
         ),
         body: new Container(
-            padding: EdgeInsets.all(16.0),
-            child: new Form(
-              key: postFormKey,
-              child: new Column(
+          padding: EdgeInsets.all(16.0),
+          child: new Form(
+            key: postFormKey,
+            child: new Column(
 //            crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget> [
-                  new TextFormField(
-                    decoration: new InputDecoration(labelText: 'Write Post'),
-                    validator: (input) => input.isEmpty ? '*Can\'t be empty' : null,
-                    onSaved: (input) => _post = input,
-                  ),
-                  new RaisedButton (
-                    child: new Text('Post', style: new TextStyle(fontSize: 20.0)),
-                    onPressed: addToDatabase,
-                  ),
-//                  new RaisedButton (
-//                    child: new Text('DateTimeTest', style: new TextStyle(fontSize: 20.0)),
-//                    onPressed: DateTimeTest,
-//                  )
-                ]
-              )
+              children: <Widget> [
+                new TextFormField(
+                  decoration: new InputDecoration(labelText: 'Write Post'),
+                  validator: (input) => input.isEmpty ? '*Can\'t be empty' : null,
+                  onSaved: (input) => _post = input,
+                ),
+                new RaisedButton (
+                  child: new Text('Post', style: new TextStyle(fontSize: 20.0)),
+                  onPressed: addToDatabase,
+                ),
+              ]
             )
+          )
         )
     );
   }

@@ -31,3 +31,78 @@ class Record {
   @override
   String toString() => "Record<$name:$post>";
 }
+
+enum Vote{
+  notVoted,
+  upvoted,
+  downvoted,
+}
+
+class buildVoteButton extends StatefulWidget {
+  final Record record;
+
+  buildVoteButton({Key key, this.record}) : super (key: key);
+
+  @override
+  State<StatefulWidget> createState() => new _buildVoteButtonState();
+}
+
+class _buildVoteButtonState extends State<buildVoteButton> {
+
+  Vote _vote = Vote.notVoted; //ideally would pull from firestore
+
+  void upVote(){
+    if(_vote == Vote.upvoted){
+      widget.record.reference.updateData({'votes': widget.record.votes - 1});
+      setState((){
+        _vote = Vote.notVoted;
+      });
+    } else {
+      if(_vote == Vote.downvoted) {
+        widget.record.reference.updateData({'votes': widget.record.votes + 2});
+      } else {
+        widget.record.reference.updateData({'votes': widget.record.votes + 1});
+      }
+      setState((){
+        _vote = Vote.upvoted;
+      });
+    }
+  }
+
+  void downVote(){
+    if(_vote == Vote.downvoted){
+      widget.record.reference.updateData({'votes': widget.record.votes + 1});
+      setState((){
+        _vote = Vote.notVoted;
+      });
+    } else {
+      if(_vote == Vote.upvoted) {
+        widget.record.reference.updateData({'votes': widget.record.votes - 2});
+      } else {
+        widget.record.reference.updateData({'votes': widget.record.votes - 1});
+      }
+      setState((){
+        _vote = Vote.downvoted;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new Row(
+      children: <Widget> [
+        IconButton(
+          icon: Icon(Icons.arrow_drop_up),
+          color: ((_vote == Vote.upvoted) ? Colors.orange : Colors.black),
+          onPressed: () => upVote(),
+        ),
+        Text('${widget.record.votes.toString()}'),
+        IconButton(
+          icon: Icon(Icons.arrow_drop_down),
+          color: ((_vote == Vote.downvoted) ? Colors.blue : Colors.black),
+          onPressed: () => downVote(),
+        )
+      ],
+    );
+  }
+}
