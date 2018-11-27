@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:nearby/record.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:location/location.dart';
+import 'package:flutter/services.dart';
+import 'dart:async';
 
 class CreatePostPage extends StatefulWidget {
 
@@ -20,6 +23,29 @@ class _CreatePostPageState extends State<CreatePostPage> {
   final postFormKey = new GlobalKey<FormState>();
 
   String _post;
+
+  Location _location = new Location();
+  StreamSubscription<Map<String, double>> _locationSub;               // new
+  Map<String, double> _currentLocation;
+  List locations = [];
+  String googleMapsApi = 'YOUR API KEY';
+  TextEditingController _latController = new TextEditingController();
+  TextEditingController _lngController = new TextEditingController();
+
+  // All new!
+  @override
+  void initState() {
+    super.initState();
+    _locationSub =
+        _location.onLocationChanged().listen((Map<String, double> locationData) {
+          setState(() {
+            _currentLocation = {
+              "latitude": locationData["latitude"],
+              "longitude": locationData['longitude'],
+            };
+          });
+        });
+  }
 
   bool validatePost(FirebaseUser user){
     final form = postFormKey.currentState;
