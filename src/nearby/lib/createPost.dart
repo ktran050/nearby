@@ -3,6 +3,8 @@ import 'package:nearby/record.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+DateTime epoch = new DateTime(1970, 1, 1);
+
 class CreatePostPage extends StatefulWidget {
 
   final Record record;

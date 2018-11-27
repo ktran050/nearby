@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:nearby/login.dart';
 
@@ -29,17 +28,42 @@ class ProfilePageState extends State<ProfilePage>{
             if(!snapshot.hasData){
               return Text('Retrieving data, please be patient!');
             }
-            return Column(
+            return Center( child: Column(
               children: <Widget>[
+                Text(
+                    cUser.displayName,
+                    style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: 2.0),
+                ),
                 Text(snapshot.data['bio']),
-                ProfilePageForm(),
               ],
-            );
+            ));
 
           },
         ), floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
     )
+    );
+  }
+
+  @override
+  void dispose(){
+    _textController.dispose();
+    super.dispose();
+  }
+}
+
+class ProfilePageEdit extends StatelessWidget{
+
+  @override
+  Widget build(BuildContext context){
+    final appTitle = 'Profile';
+    return  MaterialApp(
+        home: Scaffold(
+        appBar: AppBar(
+          title: Text(appTitle),
+        ),
+        body: ProfilePageForm(),
+      )
     );
   }
 }
@@ -49,39 +73,7 @@ class ProfilePageForm extends StatefulWidget {
   ProfilePageFormState createState() { return ProfilePageFormState(); }
 }
 
-
-class ProfilePageEdit extends StatelessWidget{
-  @override
-  Widget build(BuildContext context){
-    final appTitle = 'Profile';
-    return MaterialApp(
-      title: appTitle,
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text(appTitle),
-        ),
-        body: ProfilePageForm(),
-        floatingActionButton: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: <Widget> [
-              FloatingActionButton(
-                onPressed: () {Navigator.pushNamed(context, '/profile');},
-                tooltip: 'Go to Profile',
-                child: new Icon(Icons.account_circle),
-              ),
-              FloatingActionButton(
-                onPressed: () {Navigator.pushNamed(context, '/home');},
-                tooltip: 'Go to home page',
-                child: new Icon(Icons.home),
-              ),
-            ]
-        ),
-      ),
-    );
-  }
-}
-
-class ProfilePageFormState extends State<ProfilePageForm>{
+class ProfilePageFormState extends State<ProfilePageForm> with SingleTickerProviderStateMixin{
   // Create a global key that will uniquely identify the Form widget and allow
   // us to validate the form
   //
@@ -92,14 +84,15 @@ class ProfilePageFormState extends State<ProfilePageForm>{
   void _updateBio() async{
     await Firestore.instance.collection('users').document(
         cUser.uid).updateData({'bio': _textController.text});
+    Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     // Build a Form widget using the _formKey we created above
-    return Form(
+    return new Form(
       key: _formKey,
-      child: Column(
+      child: new Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           TextFormField(
@@ -116,16 +109,18 @@ class ProfilePageFormState extends State<ProfilePageForm>{
             }, onFieldSubmitted: (value) {},
           ),
           Center(
-//                padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: RaisedButton(
               onPressed: () {
                 // Validate will return true if the form is valid, or false if
                 // the form is invalid.
                 if (_formKey.currentState.validate()) {
                   // If the form is valid, we want to show a Snackbar
-                  Scaffold.of(context)
-                      .showSnackBar(SnackBar(content: Text('Processing Data')));
-                  _updateBio();
+                  try {
+                    _updateBio();
+                  }
+                  catch (e) {
+                    print('Error: $e');
+                  }
                 }
               },
               child: Text('Submit'),
