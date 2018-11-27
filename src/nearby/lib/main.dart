@@ -110,7 +110,7 @@ class HomePage extends StatelessWidget {
   Widget _buildBody(BuildContext context) {
     state = PageBuilds.Home;
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('posts').orderBy("date", descending: true).snapshots(), //asks for documents in the 'posts' collections
+      stream: Firestore.instance.collection('loc_test_posts').orderBy("date", descending: true).snapshots(), //asks for documents in the 'posts' collections
       builder: (context, snapshot) {
         if (!snapshot.hasData)
           return LinearProgressIndicator(); //if no posts show a moving loading bar that takes up the whole screen

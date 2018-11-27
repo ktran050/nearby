@@ -30,11 +30,10 @@ class _CreatePostPageState extends State<CreatePostPage> {
   StreamSubscription<Map<String, double>> _locationSub;               // new
   Map<String, double> _currentLocation;
   List locations = [];
-  String googleMapsApi = 'YOUR API KEY';
+  //String googleMapsApi = 'YOUR API KEY';
   TextEditingController _latController = new TextEditingController();
   TextEditingController _lngController = new TextEditingController();
 
-  // All new!
   @override
   void initState() {
     super.initState();
@@ -77,6 +76,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
             'votes': 0,
             'date': DateTime.now().difference(epoch).inSeconds,
             'comments': 0,
+            'long' : 0,
+            'lat' : 0,
           });
           String name = a.displayName;
           print('added post by $name to database');
@@ -88,6 +89,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
             'votes': 0,
             'date': DateTime.now().difference(epoch).inSeconds,
             'comments': 0,
+            'long' : 0,
+            'lat' : 0,
           });
           widget.record.reference.updateData({'comments': widget.record.comments + 1});
           Navigator.pop(context);
