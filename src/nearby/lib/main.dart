@@ -105,17 +105,11 @@ class HomePage extends StatelessWidget {
     );
   }
 
-//  Widget _buildList(BuildContext context, List<DocumentSnapshot> snapshot) {
-//    return ListView(
-//      padding: const EdgeInsets.only(top: 20.0),
-//      children: snapshot.map((data) => _buildListItem(context, data)).toList(),
-//    );
-//  }
-
   //tells flutter how to build each item in the list
   Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
 
     final record = Record.fromSnapshot(data);
+    FirebaseUser user = getUser();
 
     return Padding(
       key: ValueKey(record.name),
@@ -130,6 +124,7 @@ class HomePage extends StatelessWidget {
             ListTile(
               title: Text(record.name),
               subtitle: Text('<Location>,<Time>'),
+//              trailing : _buildDeleteButton(record)
             ),
             Container(
               child: Text(record.post),
@@ -157,77 +152,3 @@ class HomePage extends StatelessWidget {
   }//BuildListItem
 }//HomePage
 
-enum Vote{
-  notVoted,
-  upvoted,
-  downvoted,
-}
-
-class buildVoteButton extends StatefulWidget {
-  final Record record;
-
-  buildVoteButton({Key key, this.record}) : super (key: key);
-
-  @override
-  State<StatefulWidget> createState() => new _buildVoteButtonState();
-}
-
-class _buildVoteButtonState extends State<buildVoteButton> {
-
-  Vote _vote = Vote.notVoted; //ideally would pull from firestore
-
-  void upVote(){
-    if(_vote == Vote.upvoted){
-      widget.record.reference.updateData({'votes': widget.record.votes - 1});
-      setState((){
-        _vote = Vote.notVoted;
-      });
-    } else {
-      if(_vote == Vote.downvoted) {
-        widget.record.reference.updateData({'votes': widget.record.votes + 2});
-      } else {
-        widget.record.reference.updateData({'votes': widget.record.votes + 1});
-      }
-      setState((){
-        _vote = Vote.upvoted;
-      });
-    }
-  }
-
-  void downVote(){
-    if(_vote == Vote.downvoted){
-      widget.record.reference.updateData({'votes': widget.record.votes + 1});
-      setState((){
-        _vote = Vote.notVoted;
-      });
-    } else {
-      if(_vote == Vote.upvoted) {
-        widget.record.reference.updateData({'votes': widget.record.votes - 2});
-      } else {
-        widget.record.reference.updateData({'votes': widget.record.votes - 1});
-      }
-      setState((){
-        _vote = Vote.downvoted;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return new Row(
-      children: <Widget> [
-        IconButton(
-          icon: Icon(Icons.arrow_drop_up),
-          color: ((_vote == Vote.upvoted) ? Colors.orange : Colors.black),
-          onPressed: () => upVote(),
-        ),
-        Text('${widget.record.votes.toString()}'),
-        IconButton(
-          icon: Icon(Icons.arrow_drop_down),
-          color: ((_vote == Vote.downvoted) ? Colors.blue : Colors.black),
-          onPressed: () => downVote(),
-        )
-      ],
-    );
-  }
-}
