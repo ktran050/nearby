@@ -36,12 +36,6 @@ class _commentPageState extends State<commentPage> {
           new CreatePostPage(record: widget.record, postType: PostType.comment),
       )
     );
-    if(widget.record.comments > 0){
-      print('added comment by ${widget.record.name} to database');
-      setState((){
-        _comments = Comments.some;
-      });
-    }
   }
 
   @override
@@ -66,6 +60,11 @@ class _commentPageState extends State<commentPage> {
   }
 
   Widget buildCommentsList(BuildContext context){
+    if(widget.record.comments > 0){
+      setState((){
+        _comments = Comments.some;
+      });
+    }
     if(_comments == Comments.none) {
       return new Container (
         alignment: Alignment(0.0,-0.3),
@@ -89,6 +88,8 @@ class _commentPageState extends State<commentPage> {
       );
     }
   }
+
+
 
   Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
 

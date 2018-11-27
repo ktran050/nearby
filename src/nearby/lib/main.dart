@@ -5,6 +5,7 @@ import 'package:nearby/login.dart';
 import 'package:nearby/profile.dart';
 import 'package:nearby/commentPage.dart';
 import 'package:nearby/record.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() {
@@ -22,15 +23,15 @@ void main() {
   ));
 }
 
-enum PageBuilds {
-  Home,
-  Profile,
-  Contacts
-}
+//enum PageBuilds {
+//  Home,
+//  Profile,
+//  Contacts
+//}
 
 class HomePage extends StatelessWidget {
 
-  PageBuilds state;
+//  PageBuilds state;
 
   @override
   Widget build(BuildContext context) {
@@ -76,22 +77,23 @@ class HomePage extends StatelessWidget {
               children: [
                 new Text('Direct Messages here'),
                 _buildBody(context),
-                _updateStateProfile(),
+//                _updateStateProfile(),
+                ProfilePage(),
               ],
             ),
             floatingActionButton: new FloatingActionButton(
               heroTag: null,
               onPressed: () {
-                if(state == PageBuilds.Profile){
-                  Navigator.of(context).push(new MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                  new ProfilePageEdit(), ));
-                }
-                else{
+//                if(state == PageBuilds.Profile){
+//                  Navigator.of(context).push(new MaterialPageRoute(
+//                      builder: (BuildContext context) =>
+//                  new ProfilePageEdit(), ));
+//                }
+//                else{
                   Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) =>
                     new CreatePostPage(postType: PostType.post),
-                ));}
+                ));
               },
               tooltip: 'Create a Post',
               child: new Icon(Icons.mode_edit),
@@ -102,13 +104,13 @@ class HomePage extends StatelessWidget {
     );//StreamBuilder
   }//Widget
 
-  Widget _updateStateProfile(){
-    state = PageBuilds.Profile;
-    return ProfilePage  ();
-  }
+//  Widget _updateStateProfile(){
+//    state = PageBuilds.Profile;
+//    return ProfilePage  ();
+//  }
   //asks for a stream of documents from firebase
   Widget _buildBody(BuildContext context) {
-    state = PageBuilds.Home;
+//    state = PageBuilds.Home;
     return StreamBuilder<QuerySnapshot>(
       stream: Firestore.instance.collection('posts').orderBy("date", descending: true).snapshots(), //asks for documents in the 'posts' collections
       builder: (context, snapshot) {
@@ -123,6 +125,34 @@ class HomePage extends StatelessWidget {
       },
     );
   }
+
+  Future<bool> getUser(String postName) async{
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    return user.displayName == postName;
+  }
+
+  Widget buildDeleteButton(BuildContext context, Record record){
+    Future<bool> b = getUser(record.name);
+    return new FutureBuilder(
+      future: b,
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if(snapshot.data) {
+          return new IconButton(
+              icon: Icon(Icons.delete),
+              onPressed: () {
+                record.reference.delete();
+              }
+          );
+        } else {
+          return new IconButton(
+              icon: Icon(Icons.delete_outline),
+              onPressed: () {}
+          );
+        }
+      }
+    );
+  }
+//getUser(record.name).then((result){ result ? _buildDeleteButton : _buildDeleteOutline;}),
   //tells flutter how to build each item in the list
   Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
 
@@ -142,7 +172,7 @@ class HomePage extends StatelessWidget {
             ListTile(
               title: Text(record.name),
               subtitle: Text('<Location>,<Time>'),
-//              trailing : _buildDeleteButton(record)
+              trailing : buildDeleteButton(context, record)
             ),
             Container(
               child: Text(record.post),
