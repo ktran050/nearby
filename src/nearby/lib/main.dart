@@ -9,7 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() {
   runApp(MaterialApp(
-    title: 'Login with Routing Demo',
+    title: 'Nearby App',
     initialRoute: '/',
     routes: {
       '/': (context) => LoginPage(),
@@ -17,12 +17,20 @@ void main() {
       '/createPost': (context) => CreatePostPage(),
       '/settings': (context) => CreateSettingsPage(),
       '/commentPage': (context) => commentPage(),
-      '/profileEdit': (context) => ProfilePageForm(),
+      '/profileEdit': (context) => ProfilePageEdit(),
     },
   ));
 }
 
+enum PageBuilds {
+  Home,
+  Profile,
+  Contacts
+}
+
 class HomePage extends StatelessWidget {
+
+  PageBuilds state;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +41,7 @@ class HomePage extends StatelessWidget {
         theme: snapshot.data?ThemeData.dark():ThemeData.light(),
         routes: {
           '/commentPage': (context) => commentPage(),
+          '/profileEdit': (context) => ProfilePageEdit(),
         },
 
         home: DefaultTabController(
@@ -67,17 +76,22 @@ class HomePage extends StatelessWidget {
               children: [
                 new Text('Direct Messages here'),
                 _buildBody(context),
-//                _buildProfilePage(context),
-                ProfilePage(),
+                _updateStateProfile(),
               ],
             ),
             floatingActionButton: new FloatingActionButton(
               heroTag: null,
               onPressed: () {
-                Navigator.of(context).push(new MaterialPageRoute(
+                if(state == PageBuilds.Profile){
+                  Navigator.of(context).push(new MaterialPageRoute(
+                      builder: (BuildContext context) =>
+                  new ProfilePageEdit(), ));
+                }
+                else{
+                  Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) =>
                     new CreatePostPage(postType: PostType.post),
-                ));
+                ));}
               },
               tooltip: 'Create a Post',
               child: new Icon(Icons.mode_edit),
@@ -88,8 +102,13 @@ class HomePage extends StatelessWidget {
     );//StreamBuilder
   }//Widget
 
+  Widget _updateStateProfile(){
+    state = PageBuilds.Profile;
+    return ProfilePage  ();
+  }
   //asks for a stream of documents from firebase
   Widget _buildBody(BuildContext context) {
+    state = PageBuilds.Home;
     return StreamBuilder<QuerySnapshot>(
       stream: Firestore.instance.collection('posts').orderBy("date", descending: true).snapshots(), //asks for documents in the 'posts' collections
       builder: (context, snapshot) {
@@ -104,14 +123,7 @@ class HomePage extends StatelessWidget {
       },
     );
   }
-
-//  Widget _buildList(BuildContext context, List<DocumentSnapshot> snapshot) {
-//    return ListView(
-//      padding: const EdgeInsets.only(top: 20.0),
-//      children: snapshot.map((data) => _buildListItem(context, data)).toList(),
-//    );
-//  }
-
+  
   //tells flutter how to build each item in the list
   Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
 
