@@ -22,15 +22,7 @@ void main() {
   ));
 }
 
-enum PageBuilds {
-  Home,
-  Profile,
-  Contacts
-}
-
 class HomePage extends StatelessWidget {
-
-  PageBuilds state;
 
   @override
   Widget build(BuildContext context) {
@@ -76,22 +68,16 @@ class HomePage extends StatelessWidget {
               children: [
                 new Text('Direct Messages here'),
                 _buildBody(context),
-                _updateStateProfile(),
+                ProfilePage(),
               ],
             ),
             floatingActionButton: new FloatingActionButton(
               heroTag: null,
               onPressed: () {
-                if(state == PageBuilds.Profile){
-                  Navigator.of(context).push(new MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                  new ProfilePageEdit(), ));
-                }
-                else{
                   Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) =>
                     new CreatePostPage(postType: PostType.post),
-                ));}
+                ));
               },
               tooltip: 'Create a Post',
               child: new Icon(Icons.mode_edit),
@@ -102,13 +88,8 @@ class HomePage extends StatelessWidget {
     );//StreamBuilder
   }//Widget
 
-  Widget _updateStateProfile(){
-    state = PageBuilds.Profile;
-    return ProfilePage  ();
-  }
   //asks for a stream of documents from firebase
   Widget _buildBody(BuildContext context) {
-    state = PageBuilds.Home;
     return StreamBuilder<QuerySnapshot>(
       stream: Firestore.instance.collection('loc_test_posts').orderBy("date", descending: true).snapshots(), //asks for documents in the 'posts' collections
       builder: (context, snapshot) {
