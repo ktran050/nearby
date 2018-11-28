@@ -5,6 +5,8 @@ import 'package:nearby/login.dart';
 import 'package:nearby/profile.dart';
 import 'package:nearby/commentPage.dart';
 import 'package:nearby/record.dart';
+import 'package:location/location.dart';
+import 'package:haversine/haversine.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -92,7 +94,7 @@ class HomePage extends StatelessWidget {
   //asks for a stream of documents from firebase
   Widget _buildBody(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('posts').orderBy("date", descending: true).snapshots(), //asks for documents in the 'posts' collections
+      stream: Firestore.instance.collection('loc_test_posts').orderBy("date", descending: true).snapshots(), //asks for documents in the 'posts' collections
       builder: (context, snapshot) {
         if (!snapshot.hasData)
           return LinearProgressIndicator(); //if no posts show a moving loading bar that takes up the whole screen
@@ -106,6 +108,8 @@ class HomePage extends StatelessWidget {
     );
   }
 
+
+  //This func and the next widget build implement the delete button
   Future<bool> getUser(String postName) async{
     FirebaseUser user = await FirebaseAuth.instance.currentUser();
     return user.displayName == postName;
@@ -131,6 +135,48 @@ class HomePage extends StatelessWidget {
     );
   }
 
+  //this func and the next widget is supposed to calc the distance in a post to the current user,
+  Future<double> getDistance(double lat, double long) async {
+    var currentLocation = <String, double>{};
+    var location = new Location();
+    double PI = 3.14159;
+
+//    try {
+      currentLocation = await location.getLocation();
+//    } on PlatformException {
+//      currentLocation = null;
+//    }
+
+    final harvesine = new Haversine.fromDegrees(
+        latitude1: lat,
+        longitude1: long,
+        latitude2: currentLocation['latitude'],
+        longitude2: currentLocation['longitude']
+    );
+
+    print('distance: ${harvesine.distance()}');
+
+    return harvesine.distance();
+  }
+
+  Widget buildLocText(BuildContext context, double lat, double long){
+    Future<double> dist = getDistance(lat, long);
+
+    return new FutureBuilder(
+        future: dist,
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if(snapshot.data == null) {return new Text('No data');} //this is always null for some reason
+          if (snapshot.data) {
+            return new Text('${snapshot.data} miles away');
+          } else {
+            return new Text('No Location');
+          }
+        }
+    );
+  }
+
+
+
   //tells flutter how to build each item in the list
   Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
 
@@ -149,8 +195,10 @@ class HomePage extends StatelessWidget {
           children: <Widget>[
             ListTile(
               title: Text(record.name),
-              subtitle: Text('<Location>,<Time>'),
+              subtitle: Text('Lat: ${record.lat} Long: ${record.long}'),
+//              subtitle: buildLocText(context, record.lat, record.long),  //trying to get it to print distance from user
               trailing : buildDeleteButton(context, record)
+
             ),
             Container(
               child: Text(record.post),

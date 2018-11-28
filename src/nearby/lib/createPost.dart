@@ -6,7 +6,7 @@ import 'package:location/location.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
 
-DateTime epoch = new DateTime(1970, 1, 1);
+//DateTime epoch = new DateTime(1970, 1, 1);
 
 class CreatePostPage extends StatefulWidget {
 
@@ -26,28 +26,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
   String _post;
 
-  Location _location = new Location();
-  StreamSubscription<Map<String, double>> _locationSub;               // new
-  Map<String, double> _currentLocation;
-  List locations = [];
-  //String googleMapsApi = 'YOUR API KEY';
-  TextEditingController _latController = new TextEditingController();
-  TextEditingController _lngController = new TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _locationSub =
-        _location.onLocationChanged().listen((Map<String, double> locationData) {
-          setState(() {
-            _currentLocation = {
-              "latitude": locationData["latitude"],
-              "longitude": locationData['longitude'],
-            };
-          });
-        });
-  }
-
   bool validatePost(FirebaseUser user){
     final form = postFormKey.currentState;
     if(form.validate()){
@@ -61,12 +39,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
   void addToDatabase() async{
     FirebaseUser a = await FirebaseAuth.instance.currentUser();
     var epoch = new DateTime.utc(1970, 1, 1);
-//    initState();
-//    Iterable<double> currLocVals = _currentLocation.values;
-//    Iterator<double> iter = currLocVals.iterator;
-//    double lat = iter.current;
-//    iter.moveNext;
-//    double long = iter.current;
     if(validatePost(a)) {
       try{
         if (a.displayName == 'null') {
@@ -74,16 +46,25 @@ class _CreatePostPageState extends State<CreatePostPage> {
           update.displayName = 'LegacyUser';
           a.updateProfile(update);
         }
+        var currentLocation = <String, double>{};
+        var location = new Location();
+
+        try {
+          currentLocation = await location.getLocation();
+        } on PlatformException {
+          currentLocation = null;
+        }
 //        var doc = Firestore.instance.collection('posts').document();
         if(widget.postType == PostType.post) {
-          await Firestore.instance.collection('posts').document().setData({
+
+          await Firestore.instance.collection('loc_test_posts').document().setData({
             'name': a.displayName,
             'post': _post,
             'votes': 0,
             'date': DateTime.now().difference(epoch).inSeconds,
             'comments': 0,
-//            'long' : long,
-//            'lat' : lat,
+            'long' : currentLocation['longitude'],
+            'lat' : currentLocation['latitude'],
           });
           String name = a.displayName;
           print('added post by $name to database');
@@ -95,8 +76,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
             'votes': 0,
             'date': DateTime.now().difference(epoch).inSeconds,
             'comments': 0,
-//            'long' : long,
-//            'lat' : lat,
+            'long' : currentLocation['longitude'],
+            'lat' : currentLocation['latitude'],
           });
           widget.record.reference.updateData({'comments': widget.record.comments + 1});
           Navigator.pop(context);

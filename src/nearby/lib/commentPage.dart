@@ -100,7 +100,7 @@ class _commentPageState extends State<commentPage> {
           children: <Widget>[
             ListTile(
               title: Text(record.name),
-              subtitle: Text('<Location>,<Time>'),
+                subtitle: Text('Lat: ${widget.record.lat} Long: ${widget.record.long}'),
               trailing : buildDeleteButton(context, record)
             ),
             Container(
