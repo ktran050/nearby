@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:nearby/record.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:location/location.dart';
+import 'package:flutter/services.dart';
+import 'dart:async';
 
-DateTime epoch = new DateTime(1970, 1, 1);
+//DateTime epoch = new DateTime(1970, 1, 1);
 
 class CreatePostPage extends StatefulWidget {
 
@@ -33,7 +36,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
     return false;
   }
 
-  //test func to add a post to our database
   void addToDatabase() async{
     FirebaseUser a = await FirebaseAuth.instance.currentUser();
     var epoch = new DateTime.utc(1970, 1, 1);
@@ -44,14 +46,25 @@ class _CreatePostPageState extends State<CreatePostPage> {
           update.displayName = 'LegacyUser';
           a.updateProfile(update);
         }
+        var currentLocation = <String, double>{};
+        var location = new Location();
+
+        try {
+          currentLocation = await location.getLocation();
+        } on PlatformException {
+          currentLocation = null;
+        }
 //        var doc = Firestore.instance.collection('posts').document();
         if(widget.postType == PostType.post) {
-          await Firestore.instance.collection('posts').document().setData({
+
+          await Firestore.instance.collection('loc_test_posts').document().setData({
             'name': a.displayName,
             'post': _post,
             'votes': 0,
             'date': DateTime.now().difference(epoch).inSeconds,
             'comments': 0,
+            'long' : currentLocation['longitude'],
+            'lat' : currentLocation['latitude'],
           });
           String name = a.displayName;
           print('added post by $name to database');
@@ -63,6 +76,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
             'votes': 0,
             'date': DateTime.now().difference(epoch).inSeconds,
             'comments': 0,
+            'long' : currentLocation['longitude'],
+            'lat' : currentLocation['latitude'],
           });
           widget.record.reference.updateData({'comments': widget.record.comments + 1});
           Navigator.pop(context);
@@ -82,33 +97,29 @@ class _CreatePostPageState extends State<CreatePostPage> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-        appBar: new AppBar(
-          title: widget.postType == PostType.post ? new Text('Create Post') : new Text('Create Comment'),
-        ),
-        body: new Container(
-            padding: EdgeInsets.all(16.0),
-            child: new Form(
-              key: postFormKey,
-              child: new Column(
+      appBar: new AppBar(
+        title: widget.postType == PostType.post ? new Text('Create Post') : new Text('Create Comment'),
+      ),
+      body: new Container(
+        padding: EdgeInsets.all(16.0),
+        child: new Form(
+          key: postFormKey,
+          child: new Column(
 //            crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget> [
-                  new TextFormField(
-                    decoration: new InputDecoration(labelText: 'Write Post'),
-                    validator: (input) => input.isEmpty ? '*Can\'t be empty' : null,
-                    onSaved: (input) => _post = input,
-                  ),
-                  new RaisedButton (
-                    child: new Text('Post', style: new TextStyle(fontSize: 20.0)),
-                    onPressed: addToDatabase,
-                  ),
-//                  new RaisedButton (
-//                    child: new Text('DateTimeTest', style: new TextStyle(fontSize: 20.0)),
-//                    onPressed: DateTimeTest,
-//                  )
-                ]
-              )
-            )
+            children: <Widget> [
+              new TextFormField(
+                decoration: new InputDecoration(labelText: 'Write Post'),
+                validator: (input) => input.isEmpty ? '*Can\'t be empty' : null,
+                onSaved: (input) => _post = input,
+              ),
+              new RaisedButton (
+                child: new Text('Post', style: new TextStyle(fontSize: 20.0)),
+                onPressed: addToDatabase,
+              ),
+            ]
+          )
         )
+      ),
     );
   }
 }

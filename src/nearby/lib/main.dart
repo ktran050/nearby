@@ -5,7 +5,11 @@ import 'package:nearby/login.dart';
 import 'package:nearby/profile.dart';
 import 'package:nearby/commentPage.dart';
 import 'package:nearby/record.dart';
+import 'package:location/location.dart';
+import 'package:haversine/haversine.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:nearby/notifications.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -18,19 +22,12 @@ void main() {
       '/settings': (context) => CreateSettingsPage(),
       '/commentPage': (context) => commentPage(),
       '/profileEdit': (context) => ProfilePageEdit(),
+      '/notifications': (context) => CreateNotificationsPage(),
     },
   ));
 }
 
-enum PageBuilds {
-  Home,
-  Profile,
-  Contacts
-}
-
 class HomePage extends StatelessWidget {
-
-  PageBuilds state;
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +73,7 @@ class HomePage extends StatelessWidget {
               children: [
                 new Text('Direct Messages here'),
                 _buildBody(context),
-                _updateStateProfile(),
+                ProfilePage(),
               ],
             ),
             floatingActionButton: new FloatingActionButton(
@@ -96,15 +93,10 @@ class HomePage extends StatelessWidget {
     );//StreamBuilder
   }//Widget
 
-  Widget _updateStateProfile(){
-    state = PageBuilds.Profile;
-    return ProfilePage  ();
-  }
   //asks for a stream of documents from firebase
   Widget _buildBody(BuildContext context) {
-    state = PageBuilds.Home;
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('posts').orderBy("date", descending: true).snapshots(), //asks for documents in the 'posts' collections
+      stream: Firestore.instance.collection('loc_test_posts').orderBy("date", descending: true).snapshots(), //asks for documents in the 'posts' collections
       builder: (context, snapshot) {
         if (!snapshot.hasData)
           return LinearProgressIndicator(); //if no posts show a moving loading bar that takes up the whole screen
@@ -117,11 +109,81 @@ class HomePage extends StatelessWidget {
       },
     );
   }
-  
+
+
+  //This func and the next widget build implement the delete button
+  Future<bool> getUser(String postName) async{
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    return user.displayName == postName;
+  }
+
+  Widget buildDeleteButton(BuildContext context, Record record){
+    Future<bool> b = getUser(record.name);
+    return new FutureBuilder(
+        future: b,
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if(snapshot.data == null) {return new Text('');} //prevents compiler error in time between code exec and data retreival from firebase
+          if (snapshot.data) {
+            return new IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () {
+                  record.reference.delete();
+                }
+            );
+          } else {
+            return new Text('');
+          }
+        }
+    );
+  }
+
+  //this func and the next widget is supposed to calc the distance in a post to the current user,
+  Future<double> getDistance(double lat, double long) async {
+    var currentLocation = <String, double>{};
+    var location = new Location();
+    double PI = 3.14159;
+
+//    try {
+      currentLocation = await location.getLocation();
+//    } on PlatformException {
+//      currentLocation = null;
+//    }
+
+    final harvesine = new Haversine.fromDegrees(
+        latitude1: lat,
+        longitude1: long,
+        latitude2: currentLocation['latitude'],
+        longitude2: currentLocation['longitude']
+    );
+
+    print('distance: ${harvesine.distance()}');
+
+    return harvesine.distance();
+  }
+
+  Widget buildLocText(BuildContext context, double lat, double long){
+    Future<double> dist = getDistance(lat, long);
+
+    return new FutureBuilder(
+        future: dist,
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if(snapshot.data == null) {return new Text('No data');} //this is always null for some reason
+          if (snapshot.data) {
+            return new Text('${snapshot.data} miles away');
+          } else {
+            return new Text('No Location');
+          }
+        }
+    );
+  }
+
+
+
   //tells flutter how to build each item in the list
   Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
 
     final record = Record.fromSnapshot(data);
+
 
     return Padding(
       key: ValueKey(record.name),
@@ -135,7 +197,10 @@ class HomePage extends StatelessWidget {
           children: <Widget>[
             ListTile(
               title: Text(record.name),
-              subtitle: Text('<Location>,<Time>'),
+              subtitle: Text('Lat: ${record.lat} Long: ${record.long}'),
+//              subtitle: buildLocText(context, record.lat, record.long),  //trying to get it to print distance from user
+              trailing : buildDeleteButton(context, record)
+
             ),
             Container(
               child: Text(record.post),
@@ -163,77 +228,3 @@ class HomePage extends StatelessWidget {
   }//BuildListItem
 }//HomePage
 
-enum Vote{
-  notVoted,
-  upvoted,
-  downvoted,
-}
-
-class buildVoteButton extends StatefulWidget {
-  final Record record;
-
-  buildVoteButton({Key key, this.record}) : super (key: key);
-
-  @override
-  State<StatefulWidget> createState() => new _buildVoteButtonState();
-}
-
-class _buildVoteButtonState extends State<buildVoteButton> {
-
-  Vote _vote = Vote.notVoted; //ideally would pull from firestore
-
-  void upVote(){
-    if(_vote == Vote.upvoted){
-      widget.record.reference.updateData({'votes': widget.record.votes - 1});
-      setState((){
-        _vote = Vote.notVoted;
-      });
-    } else {
-      if(_vote == Vote.downvoted) {
-        widget.record.reference.updateData({'votes': widget.record.votes + 2});
-      } else {
-        widget.record.reference.updateData({'votes': widget.record.votes + 1});
-      }
-      setState((){
-        _vote = Vote.upvoted;
-      });
-    }
-  }
-
-  void downVote(){
-    if(_vote == Vote.downvoted){
-      widget.record.reference.updateData({'votes': widget.record.votes + 1});
-      setState((){
-        _vote = Vote.notVoted;
-      });
-    } else {
-      if(_vote == Vote.upvoted) {
-        widget.record.reference.updateData({'votes': widget.record.votes - 2});
-      } else {
-        widget.record.reference.updateData({'votes': widget.record.votes - 1});
-      }
-      setState((){
-        _vote = Vote.downvoted;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return new Row(
-      children: <Widget> [
-        IconButton(
-          icon: Icon(Icons.arrow_drop_up),
-          color: ((_vote == Vote.upvoted) ? Colors.orange : Colors.black),
-          onPressed: () => upVote(),
-        ),
-        Text('${widget.record.votes.toString()}'),
-        IconButton(
-          icon: Icon(Icons.arrow_drop_down),
-          color: ((_vote == Vote.downvoted) ? Colors.blue : Colors.black),
-          onPressed: () => downVote(),
-        )
-      ],
-    );
-  }
-}
