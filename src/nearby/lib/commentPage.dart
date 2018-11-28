@@ -141,7 +141,7 @@ class _commentPageState extends State<commentPage> {
 
   Widget buildDeleteButton(BuildContext context, Record record){
     Future<bool> b = getUser(record.name);
-    return new FutureBuilde
+    return new FutureBuilder(
         future: b,
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if(snapshot.data == null) {return new Text('');} //prevents compiler error in time between code exec and data retreival from firebase
