@@ -21,27 +21,21 @@ class commentPage extends StatefulWidget {
 
 class _commentPageState extends State<commentPage> {
 
-  Comments _comments = Comments.none;
+//  Comments _comments = Comments.none;
+//
+//  initState(){
+//    super.initState();
+//    setState(() {
+//      _comments = widget.record.comments == 0 ? Comments.none : Comments.some;
+//    });
+//  }
 
-  initState(){
-    super.initState();
-    setState(() {
-      _comments = widget.record.comments == 0 ? Comments.none : Comments.some;
-    });
-  }
-
-  void addComment(){
-    Navigator.of(context).push(new MaterialPageRoute(
-        builder: (BuildContext context) =>
-          new CreatePostPage(record: widget.record, postType: PostType.comment),
-      )
-    );
-    if(widget.record.comments > 0){
-      print('added comment by ${widget.record.name} to database');
-      setState((){
-        _comments = Comments.some;
-      });
-    }
+  void addComment() {
+   Navigator.of(context).push(new MaterialPageRoute(
+      builder: (BuildContext context) =>
+        new CreatePostPage(record: widget.record, postType: PostType.comment),
+    ));
+//    _comments = Added ? Comments.some : Comments.none;
   }
 
   @override
@@ -66,28 +60,28 @@ class _commentPageState extends State<commentPage> {
   }
 
   Widget buildCommentsList(BuildContext context){
-    if(_comments == Comments.none) {
-      return new Container (
-        alignment: Alignment(0.0,-0.3),
-        child: Text('No Comments :/',
-          style: TextStyle(fontSize: 20.0),
-          textAlign: TextAlign.center,
-        )
-      );
-    } else {
+//    if(_comments == Comments.none) {
+//      return new Container (
+//        alignment: Alignment(0.0,-0.3),
+//        child: Text('No Comments :/',
+//          style: TextStyle(fontSize: 20.0),
+//          textAlign: TextAlign.center,
+//        )
+//      );
+//    } else {
       return StreamBuilder<QuerySnapshot>(
         stream: widget.record.reference.collection('comments').orderBy('date', descending: true).snapshots(),
         builder: (context, snapshot) {
-          if(!snapshot.hasData)
+          if (!snapshot.hasData)
             return LinearProgressIndicator();
-
           return ListView(
-            padding: const EdgeInsets.only(top:20.0),
-            children: snapshot.data.documents.map((data) => _buildListItem(context,data)).toList(),
+            padding: const EdgeInsets.only(top: 20.0),
+            children: snapshot.data.documents.map((data) =>
+                _buildListItem(context, data)).toList(),
           );
         }
       );
-    }
+//    }
   }
 
   Widget _buildListItem(BuildContext context, DocumentSnapshot data) {

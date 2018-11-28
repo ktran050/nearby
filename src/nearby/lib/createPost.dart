@@ -110,29 +110,29 @@ class _CreatePostPageState extends State<CreatePostPage> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-        appBar: new AppBar(
-          title: widget.postType == PostType.post ? new Text('Create Post') : new Text('Create Comment'),
-        ),
-        body: new Container(
-          padding: EdgeInsets.all(16.0),
-          child: new Form(
-            key: postFormKey,
-            child: new Column(
+      appBar: new AppBar(
+        title: widget.postType == PostType.post ? new Text('Create Post') : new Text('Create Comment'),
+      ),
+      body: new Container(
+        padding: EdgeInsets.all(16.0),
+        child: new Form(
+          key: postFormKey,
+          child: new Column(
 //            crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget> [
-                new TextFormField(
-                  decoration: new InputDecoration(labelText: 'Write Post'),
-                  validator: (input) => input.isEmpty ? '*Can\'t be empty' : null,
-                  onSaved: (input) => _post = input,
-                ),
-                new RaisedButton (
-                  child: new Text('Post', style: new TextStyle(fontSize: 20.0)),
-                  onPressed: addToDatabase,
-                ),
-              ]
-            )
+            children: <Widget> [
+              new TextFormField(
+                decoration: new InputDecoration(labelText: 'Write Post'),
+                validator: (input) => input.isEmpty ? '*Can\'t be empty' : null,
+                onSaved: (input) => _post = input,
+              ),
+              new RaisedButton (
+                child: new Text('Post', style: new TextStyle(fontSize: 20.0)),
+                onPressed: addToDatabase,
+              ),
+            ]
           )
         )
+      ),
     );
   }
 }
