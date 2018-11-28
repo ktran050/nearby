@@ -9,6 +9,7 @@ import 'package:location/location.dart';
 import 'package:haversine/haversine.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:nearby/notifications.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -21,6 +22,7 @@ void main() {
       '/settings': (context) => CreateSettingsPage(),
       '/commentPage': (context) => commentPage(),
       '/profileEdit': (context) => ProfilePageEdit(),
+      '/notifications': (context) => CreateNotificationsPage(),
     },
   ));
 }
