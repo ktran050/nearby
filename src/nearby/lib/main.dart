@@ -5,6 +5,7 @@ import 'package:nearby/login.dart';
 import 'package:nearby/profile.dart';
 import 'package:nearby/commentPage.dart';
 import 'package:nearby/record.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() {
@@ -91,7 +92,7 @@ class HomePage extends StatelessWidget {
   //asks for a stream of documents from firebase
   Widget _buildBody(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('loc_test_posts').orderBy("date", descending: true).snapshots(), //asks for documents in the 'posts' collections
+      stream: Firestore.instance.collection('posts').orderBy("date", descending: true).snapshots(), //asks for documents in the 'posts' collections
       builder: (context, snapshot) {
         if (!snapshot.hasData)
           return LinearProgressIndicator(); //if no posts show a moving loading bar that takes up the whole screen
@@ -104,6 +105,32 @@ class HomePage extends StatelessWidget {
       },
     );
   }
+
+  Future<bool> getUser(String postName) async{
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    return user.displayName == postName;
+  }
+
+  Widget buildDeleteButton(BuildContext context, Record record){
+    Future<bool> b = getUser(record.name);
+    return new FutureBuilder(
+        future: b,
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if(snapshot.data == null) {return new Text('');} //prevents compiler error in time between code exec and data retreival from firebase
+          if (snapshot.data) {
+            return new IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () {
+                  record.reference.delete();
+                }
+            );
+          } else {
+            return new Text('');
+          }
+        }
+    );
+  }
+
   //tells flutter how to build each item in the list
   Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
 
@@ -123,7 +150,7 @@ class HomePage extends StatelessWidget {
             ListTile(
               title: Text(record.name),
               subtitle: Text('<Location>,<Time>'),
-//              trailing : _buildDeleteButton(record)
+              trailing : buildDeleteButton(context, record)
             ),
             Container(
               child: Text(record.post),

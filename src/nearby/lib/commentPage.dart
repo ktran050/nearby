@@ -107,6 +107,7 @@ class _commentPageState extends State<commentPage> {
             ListTile(
               title: Text(record.name),
               subtitle: Text('<Location>,<Time>'),
+              trailing : buildDeleteButton(context, record)
             ),
             Container(
               child: Text(record.post),
@@ -132,4 +133,30 @@ class _commentPageState extends State<commentPage> {
       ),//Container
     );//Padding
   }//BuildListItem
+
+  Future<bool> getUser(String postName) async{
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    return user.displayName == postName;
+  }
+
+  Widget buildDeleteButton(BuildContext context, Record record){
+    Future<bool> b = getUser(record.name);
+    return new FutureBuilde
+        future: b,
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if(snapshot.data == null) {return new Text('');} //prevents compiler error in time between code exec and data retreival from firebase
+          if (snapshot.data) {
+            return new IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () {
+                  record.reference.delete();
+                  widget.record.reference.updateData({'comments': widget.record.comments - 1});
+                }
+            );
+          } else {
+            return new Text('');
+          }
+        }
+    );
+  }
 }
