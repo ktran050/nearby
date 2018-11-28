@@ -61,12 +61,12 @@ class _CreatePostPageState extends State<CreatePostPage> {
   void addToDatabase() async{
     FirebaseUser a = await FirebaseAuth.instance.currentUser();
     var epoch = new DateTime.utc(1970, 1, 1);
-    initState();
-    Iterable<double> currLocVals = _currentLocation.values;
-    Iterator<double> iter = currLocVals.iterator;
-    double lat = iter.current;
-    iter.moveNext;
-    double long = iter.current;
+//    initState();
+//    Iterable<double> currLocVals = _currentLocation.values;
+//    Iterator<double> iter = currLocVals.iterator;
+//    double lat = iter.current;
+//    iter.moveNext;
+//    double long = iter.current;
     if(validatePost(a)) {
       try{
         if (a.displayName == 'null') {
@@ -82,8 +82,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
             'votes': 0,
             'date': DateTime.now().difference(epoch).inSeconds,
             'comments': 0,
-            'long' : long,
-            'lat' : lat,
+//            'long' : long,
+//            'lat' : lat,
           });
           String name = a.displayName;
           print('added post by $name to database');
@@ -95,8 +95,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
             'votes': 0,
             'date': DateTime.now().difference(epoch).inSeconds,
             'comments': 0,
-            'long' : long,
-            'lat' : lat,
+//            'long' : long,
+//            'lat' : lat,
           });
           widget.record.reference.updateData({'comments': widget.record.comments + 1});
           Navigator.pop(context);
