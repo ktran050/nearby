@@ -82,16 +82,10 @@ class HomePage extends StatelessWidget {
             floatingActionButton: new FloatingActionButton(
               heroTag: null,
               onPressed: () {
-                if(state == PageBuilds.Profile){
-                  Navigator.of(context).push(new MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                  new ProfilePageEdit(), ));
-                }
-                else{
                   Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) =>
                     new CreatePostPage(postType: PostType.post),
-                ));}
+                ));
               },
               tooltip: 'Create a Post',
               child: new Icon(Icons.mode_edit),

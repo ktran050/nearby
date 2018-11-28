@@ -7,6 +7,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 var mAuth = FirebaseAuth.instance;
 FirebaseUser cUser = null;
 
+var defaultPicUrl = 'https://firebasestorage.googleapis.com/v0/b/ucrcuties.appspot.com/o/profilepic%2Fprofile.gif?alt=media&token=581cf5b4-3cee-441f-b72a-85490c99b3f9';
+
 void updateCurrentUser() async{
   cUser = await mAuth.currentUser();
 }
@@ -62,6 +64,7 @@ class _LoginPageState extends State<LoginPage> {
           update.displayName = _displayName;
           user.updateProfile(update);
           Firestore.instance.collection('users').document(user.uid).setData({'bio': ''});
+          Firestore.instance.collection('users').document(user.uid).setData({'profilePicture': defaultPicUrl});
           updateCurrentUser();
           Navigator.pushNamed(context, '/home');
           print('Registered user: ${user.uid}');
