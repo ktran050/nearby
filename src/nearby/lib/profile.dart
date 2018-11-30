@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:nearby/login.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:nearby/main.dart';
 
 class ProfilePage extends StatefulWidget{
   @override
@@ -55,7 +56,10 @@ class ProfilePageState extends State<ProfilePage>{
                     ),
                     FloatingActionButton(
                       onPressed: (){
-                        Navigator.pushNamed(context, '/profileEdit');
+                          Navigator.of(context).push(new MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                          new ProfilePageEdit(),
+                        ));
                       },
                       tooltip: 'Edit Bio or Picture',
                       child: new Icon(Icons.mode_edit),
@@ -110,7 +114,10 @@ class ProfilePageFormState extends State<ProfilePageForm> with SingleTickerProvi
   void _updateBio() async{
     await Firestore.instance.collection('users').document(
         cUser.uid).updateData({'bio': _textController.text});
-//    Navigator.pushNamed(context, '/Home');
+      Navigator.of(context).push(new MaterialPageRoute(
+      builder: (BuildContext context) =>
+      new HomePage(),
+    ));
   }
 
   Future getImage() async{
@@ -119,6 +126,10 @@ class ProfilePageFormState extends State<ProfilePageForm> with SingleTickerProvi
       profilePic = tempImage;
     });
     _updateProfilePic();
+    Navigator.of(context).push(new MaterialPageRoute(
+      builder: (BuildContext context) =>
+      new HomePage(),
+    ));
   }
 
   void _updateProfilePic() async{
@@ -172,6 +183,7 @@ class ProfilePageFormState extends State<ProfilePageForm> with SingleTickerProvi
                   catch (e) {
                     print('Error: $e');
                   }
+              //    Navigator.pop(context);
                 }
               },
               child: Text('Submit'),
@@ -181,6 +193,7 @@ class ProfilePageFormState extends State<ProfilePageForm> with SingleTickerProvi
             child: RaisedButton(
               onPressed: () {
                 getImage();
+            //    Navigator.pop(context);
               },
               child: Text('Change Image'),
             )

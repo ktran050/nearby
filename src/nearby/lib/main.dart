@@ -38,7 +38,7 @@ class HomePage extends StatelessWidget {
         theme: snapshot.data?ThemeData.dark():ThemeData.light(),
         routes: {
           '/commentPage': (context) => commentPage(),
-          '/profileEdit': (context) => ProfilePageEdit(),
+//          '/profileEdit': (context) => ProfilePageEdit(),
         },
 
         home: DefaultTabController(
@@ -86,7 +86,7 @@ class HomePage extends StatelessWidget {
               },
               tooltip: 'Create a Post',
               child: new Icon(Icons.mode_edit),
-            ),//floatingActionButton
+            ), //floatingActionButton
           ),//Scaffold
         ),//TabController
       ),//MaterialApp

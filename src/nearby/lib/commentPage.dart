@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nearby/record.dart';
 import 'package:nearby/createPost.dart';
 
+
 enum Comments{
   none,
   some,
@@ -81,7 +82,6 @@ class _commentPageState extends State<commentPage> {
           );
         }
       );
-//    }
   }
 
   Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
@@ -120,12 +120,12 @@ class _commentPageState extends State<commentPage> {
                   );
                   Navigator.of(context).push(route);
                 }, //onPressed
-              ),//IconButton
-            ),//ListTile
-          ],//Widget
-        ),//Column
-      ),//Container
-    );//Padding
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }//BuildListItem
 
   Future<bool> getUser(String postName) async{

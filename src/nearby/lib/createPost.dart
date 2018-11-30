@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:nearby/record.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:nearby/location.dart';
 import 'package:location/location.dart';
 import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 import 'dart:async';
 
 //DateTime epoch = new DateTime(1970, 1, 1);
@@ -46,14 +48,17 @@ class _CreatePostPageState extends State<CreatePostPage> {
           update.displayName = 'LegacyUser';
           a.updateProfile(update);
         }
-        var currentLocation = <String, double>{};
+  /*      var currentLocation = <String, double>{};
         var location = new Location();
 
         try {
           currentLocation = await location.getLocation();
         } on PlatformException {
           currentLocation = null;
-        }
+        }*/
+        var currentLocation = await updateLocation();
+        var currentLatitude = currentLocation.latitude;
+        var currentLongitude = currentLocation.longitude;
 //        var doc = Firestore.instance.collection('posts').document();
         if(widget.postType == PostType.post) {
 
@@ -63,8 +68,10 @@ class _CreatePostPageState extends State<CreatePostPage> {
             'votes': 0,
             'date': DateTime.now().difference(epoch).inSeconds,
             'comments': 0,
-            'long' : currentLocation['longitude'],
-            'lat' : currentLocation['latitude'],
+            //'long' : currentLocation['longitude'],
+            //'lat' : currentLocation['latitude'],
+            'long' : currentLongitude,
+            'lat' : currentLatitude,
           });
           String name = a.displayName;
           print('added post by $name to database');
@@ -76,8 +83,10 @@ class _CreatePostPageState extends State<CreatePostPage> {
             'votes': 0,
             'date': DateTime.now().difference(epoch).inSeconds,
             'comments': 0,
-            'long' : currentLocation['longitude'],
-            'lat' : currentLocation['latitude'],
+            //'long' : currentLocation['longitude'],
+            //'lat' : currentLocation['latitude'],
+            'long' : currentLongitude,
+            'lat' : currentLatitude,
           });
           widget.record.reference.updateData({'comments': widget.record.comments + 1});
           Navigator.pop(context);
