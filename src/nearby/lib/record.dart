@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nearby/record.dart';
 
+double sliderValue = 3.0;
+
 enum PostType{
   post,
   comment,
@@ -105,10 +107,70 @@ class _buildVoteButtonState extends State<buildVoteButton> {
         Text('${widget.record.votes.toString()}'),
         IconButton(
           icon: Icon(Icons.arrow_drop_down),
-          color: ((_vote == Vote.downvoted) ? Colors.blue : Colors.black),
+          color: ((_vote == Vote.downvoted) ? Colors.purple[900] : Colors.black),
           onPressed: () => downVote(),
         )
       ],
+    );
+  }
+}
+
+
+enum LocRange {
+  FiveMiles,
+  FifteenMiles,
+  FiftyMiles,
+  Global,
+}
+
+class buildSlider extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => new _buildSliderState();
+}
+
+class _buildSliderState extends State<buildSlider> {
+
+//  LocRange _range = LocRange.Global;
+//  double sliderValue = 3.0;
+
+  @override
+  Widget build(BuildContext context) {
+
+    String rangeText(double val) {
+      switch(val) {
+        case 3.0 :
+          return '  Global  ';
+        case 2.0 :
+          return '50 Miles  ';
+        case 1.0 :
+          return '15 Miles  ';
+        case 0.0 :
+          return ' 5 Miles  ';
+        default:
+          return 'Global*  ';
+      }
+    }
+    return new Container(
+//          padding: EdgeInsets.symmetric(
+//            vertical: 16.0, horizontal: 16.0,
+//          ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Flexible(
+              flex: 1,
+              child: Slider(
+                activeColor: Colors.indigoAccent,
+                divisions: 3,
+                min: 0.0,
+                max: 3.0,
+                onChanged: (newRating) {setState((){ sliderValue = newRating;});},
+                value: sliderValue,
+              )
+          ),
+          Text(rangeText(sliderValue))
+        ],
+      ),
     );
   }
 }

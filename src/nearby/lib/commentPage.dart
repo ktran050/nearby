@@ -21,15 +21,6 @@ class commentPage extends StatefulWidget {
 
 class _commentPageState extends State<commentPage> {
 
-//  Comments _comments = Comments.none;
-//
-//  initState(){
-//    super.initState();
-//    setState(() {
-//      _comments = widget.record.comments == 0 ? Comments.none : Comments.some;
-//    });
-//  }
-
   void addComment() {
    Navigator.of(context).push(new MaterialPageRoute(
       builder: (BuildContext context) =>

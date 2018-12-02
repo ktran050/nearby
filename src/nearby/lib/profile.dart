@@ -110,7 +110,7 @@ class ProfilePageFormState extends State<ProfilePageForm> with SingleTickerProvi
   void _updateBio() async{
     await Firestore.instance.collection('users').document(
         cUser.uid).updateData({'bio': _textController.text});
-//    Navigator.pushNamed(context, '/Home');
+    Navigator.pushNamed(context, '/home');
   }
 
   Future getImage() async{

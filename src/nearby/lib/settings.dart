@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nearby/record.dart';
 import 'dart:async';
 
 class CreateSettingsPage extends StatefulWidget {
@@ -17,10 +18,19 @@ class _CreateSettingsPageState extends State<CreateSettingsPage> {
             home: Scaffold(
               appBar: AppBar(
                 title: Text("Settings"),
+                actions: <Widget>[
+                  IconButton(
+                  icon: Icon(Icons.arrow_back),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  ),
+                ],
               ),
               body: new Center(
                 child: new Column(
                   children: <Widget> [
+                    buildSlider(),
                     ListTile(
                       title: Text("Dark Theme"),
                       trailing: Switch(
@@ -32,10 +42,10 @@ class _CreateSettingsPageState extends State<CreateSettingsPage> {
 //                        child: new Text('Themes', style: new TextStyle(fontSize: 20.0)),
 //                        onPressed: () {Navigator.pushNamed(context,'/second');},
 //                      ),
-                    new RaisedButton (
-                      child: new Text('Notifications', style: new TextStyle(fontSize: 20.0)),
-                      onPressed: () {Navigator.pushNamed(context,'/notifications');},
-                    ),
+//                    new RaisedButton (
+//                      child: new Text('Notifications', style: new TextStyle(fontSize: 20.0)),
+//                      onPressed: () {Navigator.pushNamed(context,'/notifications');},
+//                    ),
 //                   new RaisedButton (
 //                     child: new Text('Location Sharing', style: new TextStyle(fontSize: 20.0)),
 //                     onPressed: () {Navigator.pushNamed(context,'/second');},
@@ -43,11 +53,11 @@ class _CreateSettingsPageState extends State<CreateSettingsPage> {
                   ],
                 ),
               ),
-              floatingActionButton: new FloatingActionButton(
-                onPressed: () {Navigator.pop(context);},
-                tooltip: 'Go to home page',
-                child: new Icon(Icons.home),
-              ),
+//              floatingActionButton: new FloatingActionButton(
+//                onPressed: () {Navigator.pop(context);},
+//                tooltip: 'Go to home page',
+//                child: new Icon(Icons.home),
+//              ),
             )
         )
     );

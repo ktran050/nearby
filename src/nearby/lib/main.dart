@@ -5,6 +5,7 @@ import 'package:nearby/login.dart';
 import 'package:nearby/profile.dart';
 import 'package:nearby/commentPage.dart';
 import 'package:nearby/record.dart';
+import 'package:nearby/location.dart';
 import 'package:location/location.dart';
 import 'package:haversine/haversine.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -42,8 +43,8 @@ class HomePage extends StatelessWidget {
         },
 
         home: DefaultTabController(
-          length: 3,
-          initialIndex: 1,
+          length: 2,
+          initialIndex: 0,
           child: Scaffold(
             appBar: AppBar(
               actions: <Widget>[
@@ -62,7 +63,6 @@ class HomePage extends StatelessWidget {
               ],
               bottom: TabBar(
                 tabs: [
-                  Tab(icon: Icon(Icons.message)),
                   Tab(icon: Icon(Icons.group)),
                   Tab(icon: Icon(Icons.account_circle)),
                 ],
@@ -71,8 +71,8 @@ class HomePage extends StatelessWidget {
             ),
             body: TabBarView(
               children: [
-                new Text('Direct Messages here'),
                 _buildBody(context),
+//                buildFeed(context),
                 ProfilePage(),
               ],
             ),
@@ -93,6 +93,19 @@ class HomePage extends StatelessWidget {
     );//StreamBuilder
   }//Widget
 
+
+//  Widget buildFeed(BuildContext context) {
+//    return new Column(
+//      children: <Widget> [
+//        buildSlider(),
+//        Flexible (
+//          flex: 1,
+//          child: _buildBody(context),
+//        ),
+//      ],
+//    );
+//  }
+
   //asks for a stream of documents from firebase
   Widget _buildBody(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
@@ -103,7 +116,7 @@ class HomePage extends StatelessWidget {
 
 //        return _buildList(context, snapshot.data.documents);
         return ListView(
-          padding: const EdgeInsets.only(top: 20.0),
+          padding: const EdgeInsets.only(top: 2.0),
           children: snapshot.data.documents.map((data) => _buildListItem(context, data)).toList(),
         );
       },
@@ -126,6 +139,7 @@ class HomePage extends StatelessWidget {
           if (snapshot.data) {
             return new IconButton(
                 icon: Icon(Icons.delete),
+                color: Colors.black87,
                 onPressed: () {
                   record.reference.delete();
                 }
@@ -139,26 +153,18 @@ class HomePage extends StatelessWidget {
 
   //this func and the next widget is supposed to calc the distance in a post to the current user,
   Future<double> getDistance(double lat, double long) async {
-    var currentLocation = <String, double>{};
-    var location = new Location();
-    double PI = 3.14159;
+    var currentLocation = await updateLocation();
 
-//    try {
-      currentLocation = await location.getLocation();
-//    } on PlatformException {
-//      currentLocation = null;
-//    }
-
-    final harvesine = new Haversine.fromDegrees(
+    final h = new Haversine.fromDegrees(
         latitude1: lat,
         longitude1: long,
-        latitude2: currentLocation['latitude'],
-        longitude2: currentLocation['longitude']
+        latitude2: currentLocation.latitude,
+        longitude2: currentLocation.longitude
     );
 
-    print('distance: ${harvesine.distance()}');
+    double distInMiles = h.distance()*0.000621371;
 
-    return harvesine.distance();
+    return distInMiles;
   }
 
   Widget buildLocText(BuildContext context, double lat, double long){
@@ -167,64 +173,99 @@ class HomePage extends StatelessWidget {
     return new FutureBuilder(
         future: dist,
         builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if(snapshot.data == null) {return new Text('No data');} //this is always null for some reason
-          if (snapshot.data) {
-            return new Text('${snapshot.data} miles away');
+          if(snapshot.data == null) {
+            return new Text('No Location data');
           } else {
-            return new Text('No Location');
+            return new Text('${snapshot.data.toStringAsFixed(2)} miles away');
           }
         }
     );
   }
 
-
+  double getRange(double sliderValue) {
+    if(sliderValue == 3.0) {return 100000.0;}
+    else if(sliderValue == 2.0) {return 50.0;}
+    else if(sliderValue == 1.0) { return 15.0;}
+    else { return 5.0;}
+  }
 
   //tells flutter how to build each item in the list
   Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
-
     final record = Record.fromSnapshot(data);
+    Future<double> dist = getDistance(record.lat, record.long);
+    double range = getRange(sliderValue);
 
+    return new FutureBuilder(
+      future: dist,
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if(snapshot.data == null) {
+          return new Text('No Location data');
+        } else if(range < snapshot.data) {
+          return new Text('');
+        } else {
+          return Padding(
+            key: ValueKey(record.name),
+            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.lightBlue[300],
+                border: Border.all(color: Colors.grey),
+                borderRadius: BorderRadius.circular(25.0),
+              ),
+              child: Column(
+                children: <Widget>[
+                  ListTile(
+                    //title: new Text(record.name),  **old title
 
-    return Padding(
-      key: ValueKey(record.name),
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(5.0),
-        ),
-        child: Column(
-          children: <Widget>[
-            ListTile(
-              title: Text(record.name),
-              subtitle: Text('Lat: ${record.lat} Long: ${record.long}'),
-//              subtitle: buildLocText(context, record.lat, record.long),  //trying to get it to print distance from user
-              trailing : buildDeleteButton(context, record)
+                    //new stuff
+                    title: new GestureDetector(
+                      onTap: () {
+                        //replace this with with a navigator
+                        print('Routes to this persons profile');
+                        /*if you need to pass in the record you can do
+                  Navigator.of(context).push(new MaterialPageRoute(
+                    builder: (BuildContext context) =>
+                      new UserProfilePage(record: record),
+                      //or new ProfilePage(record: record, profileState: otherPerson) if you're fancy
+                  ));
+                  */
+                      },
+                      child: new Text(record.name, style: TextStyle(fontWeight: FontWeight.bold),),
+                      //end of new stuff
 
-            ),
-            Container(
-              child: Text(record.post),
-              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
-              alignment: Alignment.topLeft,
-            ),
-            ListTile(
-              title: buildVoteButton(record: record),
-              trailing: IconButton(
-                icon: Icon(Icons.add_comment),
-                onPressed: () {
+                    ),
+                    subtitle: buildLocText(context, record.lat, record.long),
+                    trailing : buildDeleteButton(context, record)
+//                    trailing: Text(range.toString()),
+                  ),
+                  Container(
+                    child: Text(record.post),
+                    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
+                    alignment: Alignment.topLeft,
+                  ),
+                  ListTile(
+                    title: buildVoteButton(record: record),
+                    trailing: IconButton(
+                      icon: Icon(Icons.add_comment),
+                      color: Colors.black87,
+                      onPressed: () {
 //                  Navigator.pushNamed(context, '/commentPage');
-                    var route = new MaterialPageRoute(
-                      builder: (BuildContext context) =>
+                        var route = new MaterialPageRoute(
+                          builder: (BuildContext context) =>
                           new commentPage(record: record),
-                    );
-                    Navigator.of(context).push(route);
-                }, //onPressed
-              ),//IconButton
-            ),//ListTile
-          ],//Widget
-        ),//Column
-      ),//Container
-    );//Padding
+                        );
+                        Navigator.of(context).push(route);
+                      }, //onPressed
+                    ),//IconButton
+                  ),//ListTile
+                ],//Widget
+              ),//Column
+            ),//Container
+          );//Padding
+        }
+      }
+    );
+
   }//BuildListItem
 }//HomePage
 
