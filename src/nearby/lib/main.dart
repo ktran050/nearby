@@ -126,6 +126,7 @@ class HomePage extends StatelessWidget {
           if (snapshot.data) {
             return new IconButton(
                 icon: Icon(Icons.delete),
+                color: Colors.black87,
                 onPressed: () {
                   record.reference.delete();
                 }
@@ -176,28 +177,39 @@ class HomePage extends StatelessWidget {
         }
     );
   }
-
-
-
   //tells flutter how to build each item in the list
   Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
 
     final record = Record.fromSnapshot(data);
-
-
     return Padding(
       key: ValueKey(record.name),
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Container(
         decoration: BoxDecoration(
+          color: Colors.lightBlue[300],
           border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(5.0),
+          borderRadius: BorderRadius.circular(25.0),
         ),
         child: Column(
           children: <Widget>[
             ListTile(
-              title: Text(record.name),
-              subtitle: Text('Lat: ${record.lat} Long: ${record.long}'),
+                title: new GestureDetector(
+                  onTap: () {
+                    //replace this with with a navigator
+                    print('Routes to this persons profile');
+                    /*if you need to pass in the record you can do
+                  Navigator.of(context).push(new MaterialPageRoute(
+                    builder: (BuildContext context) =>
+                      new UserProfilePage(record: record),
+                      //or new ProfilePage(record: record, profileState: otherPerson) if you're fancy
+                  ));
+                  */
+                  },
+                  child: new Text(record.name, style: TextStyle(fontWeight: FontWeight.bold),),
+                  //end of new stuff
+
+                ),
+//              subtitle: Text('Lat: ${record.lat} Long: ${record.long}'),
 //              subtitle: buildLocText(context, record.lat, record.long),  //trying to get it to print distance from user
               trailing : buildDeleteButton(context, record)
 
@@ -211,6 +223,7 @@ class HomePage extends StatelessWidget {
               title: buildVoteButton(record: record),
               trailing: IconButton(
                 icon: Icon(Icons.add_comment),
+                color: Colors.black87,
                 onPressed: () {
 //                  Navigator.pushNamed(context, '/commentPage');
                     var route = new MaterialPageRoute(
