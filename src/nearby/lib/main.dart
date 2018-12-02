@@ -182,13 +182,6 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  double getRange(double sliderValue) {
-    if(sliderValue == 3.0) {return 100000.0;}
-    else if(sliderValue == 2.0) {return 50.0;}
-    else if(sliderValue == 1.0) { return 15.0;}
-    else { return 5.0;}
-  }
-
   //tells flutter how to build each item in the list
   Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
     final record = Record.fromSnapshot(data);

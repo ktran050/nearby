@@ -116,22 +116,12 @@ class _buildVoteButtonState extends State<buildVoteButton> {
 }
 
 
-enum LocRange {
-  FiveMiles,
-  FifteenMiles,
-  FiftyMiles,
-  Global,
-}
-
 class buildSlider extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => new _buildSliderState();
 }
 
 class _buildSliderState extends State<buildSlider> {
-
-//  LocRange _range = LocRange.Global;
-//  double sliderValue = 3.0;
 
   @override
   Widget build(BuildContext context) {
@@ -151,9 +141,6 @@ class _buildSliderState extends State<buildSlider> {
       }
     }
     return new Container(
-//          padding: EdgeInsets.symmetric(
-//            vertical: 16.0, horizontal: 16.0,
-//          ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
@@ -173,4 +160,11 @@ class _buildSliderState extends State<buildSlider> {
       ),
     );
   }
+}
+
+double getRange(double sliderValue) {
+  if(sliderValue == 3.0) {return 100000.0;}
+  else if(sliderValue == 2.0) {return 50.0;}
+  else if(sliderValue == 1.0) { return 15.0;}
+  else { return 5.0;}
 }

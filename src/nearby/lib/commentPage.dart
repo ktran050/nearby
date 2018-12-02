@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:nearby/location.dart';
+import 'package:location/location.dart';
+import 'package:haversine/haversine.dart';
 import 'package:nearby/record.dart';
 import 'package:nearby/createPost.dart';
 
@@ -75,48 +78,112 @@ class _commentPageState extends State<commentPage> {
 //    }
   }
 
+  Future<double> getDistance(double lat, double long) async {
+    var currentLocation = await updateLocation();
+
+    final h = new Haversine.fromDegrees(
+        latitude1: lat,
+        longitude1: long,
+        latitude2: currentLocation.latitude,
+        longitude2: currentLocation.longitude
+    );
+
+    double distInMiles = h.distance()*0.000621371;
+
+    return distInMiles;
+  }
+
+  Widget buildLocText(BuildContext context, double lat, double long){
+    Future<double> dist = getDistance(lat, long);
+
+    return new FutureBuilder(
+        future: dist,
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if(snapshot.data == null) {
+            return new Text('No Location data');
+          } else {
+            return new Text('${snapshot.data.toStringAsFixed(2)} miles away');
+          }
+        }
+    );
+  }
+
   Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
-
     final record = Record.fromSnapshot(data);
+    Future<double> dist = getDistance(record.lat, record.long);
+    double range = getRange(sliderValue);
 
-    return Padding(
-      key: ValueKey(record.name),
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(5.0),
-        ),
-        child: Column(
-          children: <Widget>[
-            ListTile(
-              title: Text(record.name),
-                subtitle: Text('Lat: ${widget.record.lat} Long: ${widget.record.long}'),
-              trailing : buildDeleteButton(context, record)
-            ),
-            Container(
-              child: Text(record.post),
-              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
-              alignment: Alignment.topLeft,
-            ),
-            ListTile(
-              title: buildVoteButton(record: record),
-              trailing: IconButton(
-                icon: Icon(Icons.add_comment),
-                onPressed: () {
-//                  Navigator.pushNamed(context, '/commentPage');
-                  var route = new MaterialPageRoute(
+    return new FutureBuilder(
+        future: dist,
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if(snapshot.data == null) {
+            return new Text('No Location data');
+          } else if(range < snapshot.data) {
+            return new Text('');
+          } else {
+            return Padding(
+              key: ValueKey(record.name),
+              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.lightBlue[300],
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(25.0),
+                ),
+                child: Column(
+                  children: <Widget>[
+                    ListTile(
+                      //title: new Text(record.name),  **old title
+
+                      //new stuff
+                        title: new GestureDetector(
+                          onTap: () {
+                            //replace this with with a navigator
+                            print('Routes to this persons profile');
+                            /*if you need to pass in the record you can do
+                  Navigator.of(context).push(new MaterialPageRoute(
                     builder: (BuildContext context) =>
-                    new commentPage(record: record),
-                  );
-                  Navigator.of(context).push(route);
-                }, //onPressed
-              ),//IconButton
-            ),//ListTile
-          ],//Widget
-        ),//Column
-      ),//Container
-    );//Padding
+                      new UserProfilePage(record: record),
+                      //or new ProfilePage(record: record, profileState: otherPerson) if you're fancy
+                  ));
+                  */
+                          },
+                          child: new Text(record.name, style: TextStyle(fontWeight: FontWeight.bold),),
+                          //end of new stuff
+
+                        ),
+                        subtitle: buildLocText(context, record.lat, record.long),
+                        trailing : buildDeleteButton(context, record)
+//                    trailing: Text(range.toString()),
+                    ),
+                    Container(
+                      child: Text(record.post),
+                      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
+                      alignment: Alignment.topLeft,
+                    ),
+                    ListTile(
+                      title: buildVoteButton(record: record),
+                      trailing: IconButton(
+                        icon: Icon(Icons.add_comment),
+                        color: Colors.black87,
+                        onPressed: () {
+//                  Navigator.pushNamed(context, '/commentPage');
+                          var route = new MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                            new commentPage(record: record),
+                          );
+                          Navigator.of(context).push(route);
+                        }, //onPressed
+                      ),//IconButton
+                    ),//ListTile
+                  ],//Widget
+                ),//Column
+              ),//Container
+            );//Padding
+          }
+        }
+    );
+
   }//BuildListItem
 
   Future<bool> getUser(String postName) async{

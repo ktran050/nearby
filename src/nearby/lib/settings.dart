@@ -30,6 +30,9 @@ class _CreateSettingsPageState extends State<CreateSettingsPage> {
               body: new Center(
                 child: new Column(
                   children: <Widget> [
+                    ListTile(
+                      title: Text("Change radius of received posts")
+                    ),
                     buildSlider(),
                     ListTile(
                       title: Text("Dark Theme"),
