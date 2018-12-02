@@ -85,12 +85,7 @@ class savedVotesPage extends StatelessWidget{
                     child: IconButton(
                       icon: Icon(Icons.remove),
                       onPressed: () {
-//                  Navigator.pushNamed(context, '/commentPage');
-                        var route = new MaterialPageRoute(  // TODO: 'remove' button behavior
-                          builder: (BuildContext context) =>
-                          new commentPage(record: record),
-                        );
-                        Navigator.of(context).push(route);
+                        // TODO: 'remove' button behavior
                       }, //onPressed
                     )
                 ),

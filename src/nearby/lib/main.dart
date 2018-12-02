@@ -10,6 +10,7 @@ import 'package:haversine/haversine.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:nearby/notifications.dart';
+import 'package:nearby/savedVotes.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -23,6 +24,7 @@ void main() {
       '/commentPage': (context) => commentPage(),
       '/profileEdit': (context) => ProfilePageEdit(),
       '/notifications': (context) => CreateNotificationsPage(),
+      '/savedVotes': (context) => savedVotesPage(),
     },
   ));
 }
@@ -39,6 +41,7 @@ class HomePage extends StatelessWidget {
         routes: {
           '/commentPage': (context) => commentPage(),
           '/profileEdit': (context) => ProfilePageEdit(),
+          '/savedVotes': (context) => savedVotesPage(),
         },
 
         home: DefaultTabController(
@@ -207,20 +210,31 @@ class HomePage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
               alignment: Alignment.topLeft,
             ),
-            ListTile(
-              title: buildVoteButton(record: record),
-              trailing: IconButton(
-                icon: Icon(Icons.add_comment),
-                onPressed: () {
-//                  Navigator.pushNamed(context, '/commentPage');
-                    var route = new MaterialPageRoute(
-                      builder: (BuildContext context) =>
+            Row(
+              children: <Widget>[
+                Expanded(
+                    child: buildVoteButton(record: record),
+                ),
+                Expanded(
+                    child: IconButton(
+                      icon: Icon(Icons.add),
+//                      onPressed: , TODO: onPressed Behaviour
+                    ),
+                ),
+                Expanded(
+                    child: IconButton(
+                      icon: Icon(Icons.add_comment),
+                      onPressed: () {
+                        var route = new MaterialPageRoute(
+                          builder: (BuildContext context) =>
                           new commentPage(record: record),
-                    );
-                    Navigator.of(context).push(route);
-                }, //onPressed
-              ),//IconButton
-            ),//ListTile
+                        );
+                        Navigator.of(context).push(route);
+                      }, //onPressed
+                    ),
+                ),
+              ],
+            ),
           ],//Widget
         ),//Column
       ),//Container
