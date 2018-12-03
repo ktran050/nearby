@@ -58,7 +58,7 @@ class savedVotesPage extends StatelessWidget{
           children: <Widget>[
             ListTile(
               title: Text(record.name),
-              subtitle: Text('Time: ' + postDate.toString()),
+              subtitle: Text('Time Posted: ' + postDate.toString()),
             ),
             Container(
               child: Text(record.post),
