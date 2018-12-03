@@ -71,7 +71,12 @@ class ProfilePageState extends State<ProfilePage>{
                               onPressed: (){
                                 Navigator.pushNamed(context, '/savedVotes');
                               },
-                              child: new Icon(Icons.bookmark),
+                              child: IconTheme(
+                                child: Icon(Icons.favorite),
+                                data: IconThemeData(
+                                  color: Colors.white,
+                                ),
+                              ),
                             )
                         )
                       ],

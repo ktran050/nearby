@@ -42,6 +42,7 @@ class HomePage extends StatelessWidget {
           '/commentPage': (context) => commentPage(),
           '/profileEdit': (context) => ProfilePageEdit(),
           '/savedVotes': (context) => savedVotesPage(),
+          '/settings': (context) => CreateSettingsPage(),
         },
 
         home: DefaultTabController(
@@ -185,13 +186,10 @@ class HomePage extends StatelessWidget {
     );
   }
 
-
-
   //tells flutter how to build each item in the list
   Widget _buildListItem(BuildContext context, DocumentSnapshot data){
 
     final record = Record.fromSnapshot(data);
-
     return Padding (
       key: ValueKey(record.name),
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -215,10 +213,9 @@ class HomePage extends StatelessWidget {
               alignment: Alignment.topLeft,
             ),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
-                Expanded(
-                    child: buildVoteButton(record: record),
-                ),
+                buildVoteButton(record: record),
                 Expanded(
                     child: IconButton(
                       icon: Icon(Icons.add),

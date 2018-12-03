@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:nearby/commentPage.dart';
 import 'package:nearby/record.dart';
 
 class savedVotesPage extends StatelessWidget{
@@ -45,6 +44,8 @@ class savedVotesPage extends StatelessWidget{
   Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
 
     final record = Record.fromSnapshot(data);
+    var epoch = DateTime.utc(1970,1,1);
+    var postDate = epoch.add(new Duration(seconds: record.date));
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -57,7 +58,7 @@ class savedVotesPage extends StatelessWidget{
           children: <Widget>[
             ListTile(
               title: Text(record.name),
-              subtitle: Text('TODO: add date here instead of location') ,
+              subtitle: Text('Time: ' + postDate.toString()),
             ),
             Container(
               child: Text(record.post),
@@ -65,31 +66,19 @@ class savedVotesPage extends StatelessWidget{
               alignment: Alignment.topLeft,
             ),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
-                buildVoteButton(record: record), // TODO: Fix votes not propagating
-                Expanded(
-                  child: IconButton(  // TODO: fix comments not progagating? maybe
-                    icon: Icon(Icons.add_comment),
-                    onPressed: () {
-                      var route = new MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                        new commentPage(record: record),
-                      );
-                      Navigator.of(context).push(route);
-                    }, //onPressed
-                  ),
-                ),
-                Expanded(
-                    child: IconButton(
-                      icon: Icon(Icons.remove),
-                      onPressed: () {
-                        Firestore.instance.collection('users').
-                        document('potato').
-                        collection('savedPosts').document(record.name+record.date.toString()).
-                        delete();
-                        print('deleted');
-                      }, //onPressed
-                    )
+                buildVoteButton(record: record),  // TODO: Disable or integrate voting
+
+                IconButton(
+                  icon: Icon(Icons.remove),
+                  onPressed: () {
+                    Firestore.instance.collection('users').
+                    document('potato').
+                    collection('savedPosts').
+                    document(record.name+record.date.toString()).
+                    delete();
+                  }, //onPressed
                 ),
               ],
             ),
@@ -99,24 +88,3 @@ class savedVotesPage extends StatelessWidget{
     );
   }//BuildListItem
 } // Saved Votes Page
-
-//ListTile(
-//title: Text(record.name),
-//subtitle: Text('Lat: ${record.lat} Long: ${record.long}'),
-//
-//),
-//Container(
-//child: Text(record.post),
-//padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
-//alignment: Alignment.topLeft,
-//),
-//ListTile(
-//title: buildVoteButton(record: record),
-//trailing: IconButton(
-//icon: Icon(Icons.add_comment),
-//onPressed: () {
-//var route = new MaterialPageRoute(
-//builder: (BuildContext context) =>
-//);
-//Navigator.of(context).push(route);
-//}, //onPressed
