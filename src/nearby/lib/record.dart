@@ -16,6 +16,7 @@ class Record {
   final DocumentReference reference;
   final double long;
   final double lat;
+  final int date;
 
   Record.fromMap(Map<String, dynamic> map, {this.reference})
       : assert(map['comments'] != null),
@@ -24,12 +25,15 @@ class Record {
         assert(map['name'] != null),
         assert(map['post'] != null),
         assert(map['votes'] != null),
+        assert(map['votes'] != null),
+        assert(map['date'] != null),
         comments = map['comments'],
         long = map['long'],
         lat = map['lat'],
         name = map['name'],
         post = map['post'],
-        votes = map['votes'];
+        votes = map['votes'],
+        date = map['date'];
 
   Record.fromSnapshot(DocumentSnapshot snapshot)
       : this.fromMap(snapshot.data, reference: snapshot.reference);

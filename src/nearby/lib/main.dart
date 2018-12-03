@@ -140,6 +140,11 @@ class HomePage extends StatelessWidget {
     );
   }
 
+  Future<String> getUID() async{
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    return user.uid;
+  }
+
   //this func and the next widget is supposed to calc the distance in a post to the current user,
   Future<double> getDistance(double lat, double long) async {
     var currentLocation = <String, double>{};
@@ -183,12 +188,11 @@ class HomePage extends StatelessWidget {
 
 
   //tells flutter how to build each item in the list
-  Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
+  Widget _buildListItem(BuildContext context, DocumentSnapshot data){
 
     final record = Record.fromSnapshot(data);
 
-
-    return Padding(
+    return Padding (
       key: ValueKey(record.name),
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Container(
@@ -218,7 +222,22 @@ class HomePage extends StatelessWidget {
                 Expanded(
                     child: IconButton(
                       icon: Icon(Icons.add),
-//                      onPressed: , TODO: onPressed Behaviour
+                      onPressed: (){
+                        Firestore.instance.collection('users').document(
+                          'potato'
+                          // TODO: have user ID here as type string
+                        ).collection('savedPosts').document(
+                          record.name+record.date.toString()
+                        ).setData({
+                          'name': record.name,
+                          'post': record.post,
+                          'votes': record.votes,
+                          'date': record.date,
+                          'comments': record.comments,
+                          'long' : record.long,
+                          'lat' : record.lat,
+                        });
+                      },
                     ),
                 ),
                 Expanded(

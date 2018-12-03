@@ -57,7 +57,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
 //        var doc = Firestore.instance.collection('posts').document();
         if(widget.postType == PostType.post) {
 
-          await Firestore.instance.collection('loc_test_posts').document().setData({
+          int date=DateTime.now().difference(epoch).inSeconds;
+
+          await Firestore.instance.collection('loc_test_posts').document(
+            a.displayName+date.toString() // Sets the post document name
+          ).setData({
             'name': a.displayName,
             'post': _post,
             'votes': 0,

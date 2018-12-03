@@ -28,7 +28,7 @@ class savedVotesPage extends StatelessWidget{
   } // Build
   Widget _buildBody(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('loc_test_posts').orderBy("date", descending: true).snapshots(), //asks for documents in the 'posts' collections
+      stream: Firestore.instance.collection('users').document('potato').collection('savedPosts').orderBy("date", descending: true).snapshots(), //asks for documents in the 'posts' collections
       builder: (context, snapshot) {
         if (!snapshot.hasData)
           return LinearProgressIndicator(); //if no posts show a moving loading bar that takes up the whole screen
@@ -56,23 +56,21 @@ class savedVotesPage extends StatelessWidget{
         child: Column(
           children: <Widget>[
             ListTile(
-              title: Text('Post Name'),
-              subtitle: Text('Subtitle Data'),
-
+              title: Text(record.name),
+              subtitle: Text('TODO: add date here instead of location') ,
             ),
             Container(
-              child: Text('Post Data'),
+              child: Text(record.post),
               padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
               alignment: Alignment.topLeft,
             ),
             Row(
               children: <Widget>[
-                buildVoteButton(record: record),
+                buildVoteButton(record: record), // TODO: Fix votes not propagating
                 Expanded(
-                  child: IconButton(
+                  child: IconButton(  // TODO: fix comments not progagating? maybe
                     icon: Icon(Icons.add_comment),
                     onPressed: () {
-//                  Navigator.pushNamed(context, '/commentPage');
                       var route = new MaterialPageRoute(
                         builder: (BuildContext context) =>
                         new commentPage(record: record),
@@ -85,7 +83,11 @@ class savedVotesPage extends StatelessWidget{
                     child: IconButton(
                       icon: Icon(Icons.remove),
                       onPressed: () {
-                        // TODO: 'remove' button behavior
+                        Firestore.instance.collection('users').
+                        document('potato').
+                        collection('savedPosts').document(record.name+record.date.toString()).
+                        delete();
+                        print('deleted');
                       }, //onPressed
                     )
                 ),
