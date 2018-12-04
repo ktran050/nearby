@@ -53,12 +53,33 @@ class ProfilePageState extends State<ProfilePage>{
                     Text(
                         snapshot.data['bio']
                     ),
-                    FloatingActionButton(
-                      onPressed: (){
-                        Navigator.pushNamed(context, '/profileEdit');
-                      },
-                      tooltip: 'Edit Bio or Picture',
-                      child: new Icon(Icons.mode_edit),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                            child: FloatingActionButton(
+                              heroTag: 'edit',
+                              onPressed: (){
+                                Navigator.pushNamed(context, '/profileEdit');
+                              },
+                              tooltip: 'Edit Bio or Picture',
+                              child: new Icon(Icons.mode_edit),
+                            )
+                        ),
+                        Expanded(
+                            child: FloatingActionButton(
+                              heroTag: 'savedVotes',
+                              onPressed: (){
+                                Navigator.pushNamed(context, '/savedVotes');
+                              },
+                              child: IconTheme(
+                                child: Icon(Icons.favorite),
+                                data: IconThemeData(
+                                  color: Colors.white,
+                                ),
+                              ),
+                            )
+                        )
+                      ],
                     )
                   ],
                 ),

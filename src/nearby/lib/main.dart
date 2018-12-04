@@ -11,6 +11,7 @@ import 'package:haversine/haversine.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:nearby/notifications.dart';
+import 'package:nearby/savedVotes.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -40,6 +41,8 @@ class HomePage extends StatelessWidget {
         routes: {
           '/commentPage': (context) => commentPage(),
           '/profileEdit': (context) => ProfilePageEdit(),
+          '/savedVotes': (context) => savedVotesPage(),
+          '/settings': (context) => CreateSettingsPage(),
         },
 
         home: DefaultTabController(
@@ -236,21 +239,48 @@ class HomePage extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
                     alignment: Alignment.topLeft,
                   ),
-                  ListTile(
-                    title: buildVoteButton(record: record),
-                    trailing: IconButton(
-                      icon: Icon(Icons.add_comment),
-                      color: Colors.black87,
-                      onPressed: () {
-//                  Navigator.pushNamed(context, '/commentPage');
-                        var route = new MaterialPageRoute(
-                          builder: (BuildContext context) =>
-                          new commentPage(record: record),
-                        );
-                        Navigator.of(context).push(route);
-                      }, //onPressed
-                    ),//IconButton
-                  ),//ListTile
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      buildVoteButton(record: record),
+                      Expanded(
+                        child: IconButton(
+                          icon: Icon(Icons.add),
+                          onPressed: () {
+                            Firestore.instance.collection('users')
+                                .document(
+                                'potato'
+                              // TODO: have user ID here as type string
+                            ).collection('savedPosts')
+                                .document(
+                                record.name + record.date.toString()
+                            )
+                                .setData({
+                              'name': record.name,
+                              'post': record.post,
+                              'votes': record.votes,
+                              'date': record.date,
+                              'comments': record.comments,
+                              'long': record.long,
+                              'lat': record.lat,
+                            });
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: IconButton(
+                          icon: Icon(Icons.add_comment),
+                          onPressed: () {
+                            var route = new MaterialPageRoute(
+                              builder: (BuildContext context) =>
+                              new commentPage(record: record),
+                            );
+                            Navigator.of(context).push(route);
+                          }, //onPressed
+                        ), //IconButton
+                      ), //ListTile
+                    ], //Widget
+                  ), //Column
                 ],//Widget
               ),//Column
             ),//Container
