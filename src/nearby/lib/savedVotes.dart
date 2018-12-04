@@ -74,7 +74,7 @@ class savedVotesPage extends StatelessWidget{
                   icon: Icon(Icons.remove),
                   onPressed: () {
                     Firestore.instance.collection('users').
-                    document('potato').
+                    document('testUser'). // TODO change test user to current user
                     collection('savedPosts').
                     document(record.name+record.date.toString()).
                     delete();
