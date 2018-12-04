@@ -27,7 +27,7 @@ class savedVotesPage extends StatelessWidget{
   } // Build
   Widget _buildBody(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('users').document('potato').collection('savedPosts').orderBy("date", descending: true).snapshots(), //asks for documents in the 'posts' collections
+      stream: Firestore.instance.collection('users').document('testUser').collection('savedPosts').orderBy("date", descending: true).snapshots(), //asks for documents in the 'posts' collections
       builder: (context, snapshot) {
         if (!snapshot.hasData)
           return LinearProgressIndicator(); //if no posts show a moving loading bar that takes up the whole screen
